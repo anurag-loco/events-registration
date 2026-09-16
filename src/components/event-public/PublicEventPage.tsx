@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useRef } from "react";
 import { CalendarDays, MapPin, Video, Globe, Users } from "lucide-react";
 import type { Event } from "@/hooks/useEvents";
@@ -6,14 +5,20 @@ import type { EventModule } from "@/hooks/useEventModules";
 import { Hero } from "./Hero";
 import { StickyRegisterBar } from "./StickyRegisterBar";
 import { PublicModule } from "./PublicModule";
+import {
+  DEFAULT_BRAND_COLOR,
+  DEFAULT_EVENT,
+  DEFAULT_FORMATTED_DATE,
+  DEFAULT_MODULES,
+} from "@/lib/component-defaults";
 
 interface Props {
-  event: Event;
-  modules: EventModule[];
-  brandColor: string;
-  isDark: boolean;
-  formattedDate: string;
-  formSlot: React.ReactNode;
+  event?: Event;
+  modules?: EventModule[];
+  brandColor?: string;
+  isDark?: boolean;
+  formattedDate?: string;
+  formSlot?: React.ReactNode;
 }
 
 /**
@@ -21,13 +26,21 @@ interface Props {
  * stacked/cards templates. Mobile-first; full-bleed hero; bespoke module sections;
  * sticky register CTA; in-page register section.
  */
+const DEFAULT_FORM_SLOT = (
+  <div className="space-y-3">
+    <div className="h-11 rounded-xl bg-muted" />
+    <div className="h-11 rounded-xl bg-muted" />
+    <div className="h-12 rounded-full bg-foreground/80" />
+  </div>
+);
+
 export function PublicEventPage({
-  event,
-  modules,
-  brandColor,
-  isDark,
-  formattedDate,
-  formSlot,
+  event = DEFAULT_EVENT,
+  modules = DEFAULT_MODULES,
+  brandColor = DEFAULT_BRAND_COLOR,
+  isDark = false,
+  formattedDate = DEFAULT_FORMATTED_DATE,
+  formSlot = DEFAULT_FORM_SLOT,
 }: Props) {
   const registerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +61,7 @@ export function PublicEventPage({
 
   return (
     <div className={isDark ? "dark" : ""}>
-      <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <div className="min-h-screen bg-white text-foreground overflow-x-hidden">
         <Hero
           event={event}
           brandColor={brandColor}
@@ -66,12 +79,7 @@ export function PublicEventPage({
         {event.description && (
           <section className="relative px-5 sm:px-8 lg:px-12 py-16 sm:py-24 lg:py-36">
             <div className="max-w-4xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
+              <div>
                 <p
                   className="text-[10px] sm:text-xs font-bold tracking-[0.25em] uppercase mb-5 sm:mb-6"
                   style={{ color: brandColor }}
@@ -95,7 +103,7 @@ export function PublicEventPage({
                     <Fact icon={<Users className="w-5 h-5" />} label="Capacity" value={`${event.capacity} attendees`} brandColor={brandColor} />
                   )}
                 </div>
-              </motion.div>
+              </div>
             </div>
           </section>
         )}
@@ -111,19 +119,12 @@ export function PublicEventPage({
           id="register"
           className="relative px-4 sm:px-8 lg:px-12 py-16 sm:py-24 lg:py-36 overflow-hidden"
         >
-          {/* Brand-tinted bed */}
+          {/* White bed behind the registration form */}
           <div
-            className="absolute inset-0 -z-10"
-            style={{
-              background: `radial-gradient(circle at 25% 30%, ${brandColor}22, transparent 55%), radial-gradient(circle at 80% 70%, hsl(265 90% 55% / 0.15), transparent 50%)`,
-            }}
+            className="absolute inset-0 -z-10 bg-white"
           />
           <div className="max-w-2xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            <div
               className="text-center mb-8 sm:mb-12"
             >
               <p
@@ -138,17 +139,13 @@ export function PublicEventPage({
               >
                 Register for {event.name}
               </h2>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-              className="rounded-3xl bg-card p-5 sm:p-8 lg:p-10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)]"
+            <div
+              className="rounded-3xl bg-white p-5 sm:p-8 lg:p-10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] border border-black/5"
             >
               {formSlot}
-            </motion.div>
+            </div>
 
             <p className="text-center text-xs text-muted-foreground mt-8">
               Powered by <span className="font-semibold text-foreground">eventspark</span>

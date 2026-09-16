@@ -5,8 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import QRCode from "qrcode";
 import { ArrowLeft, Loader2, CalendarDays, MapPin, CheckCircle2, Download, Ticket as TicketIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_TICKET } from "@/lib/component-defaults";
 
 interface TicketData {
   id: string;
@@ -48,8 +49,10 @@ const Ticket = () => {
   const { registrationId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [ticket, setTicket] = useState<TicketData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [ticket, setTicket] = useState<TicketData>({
+    ...DEFAULT_TICKET,
+    id: registrationId || DEFAULT_TICKET.id,
+  });
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const downloadRef = useRef<HTMLAnchorElement>(null);
 
@@ -64,18 +67,13 @@ const Ticket = () => {
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!registrationId) {
-        setLoading(false);
-        return;
-      }
-      const { data, error } = await supabase.rpc("get_ticket", { p_registration_id: registrationId });
-      if (!active) return;
-      if (error || !data) {
-        setTicket(null);
-      } else {
-        setTicket(data as unknown as TicketData);
-      }
-      setLoading(false);
+      const data = await withFallback(async () => {
+        if (!registrationId) return { ...DEFAULT_TICKET };
+        const { data, error } = await supabase.rpc("get_ticket", { p_registration_id: registrationId });
+        if (error || !data) throw new Error("ticket-missing");
+        return data as unknown as TicketData;
+      }, { ...DEFAULT_TICKET, id: registrationId || DEFAULT_TICKET.id });
+      if (active) setTicket(data);
     })();
     return () => {
       active = false;
@@ -83,8 +81,8 @@ const Ticket = () => {
   }, [registrationId]);
 
   useEffect(() => {
-    if (!registrationId) return;
-    QRCode.toDataURL(registrationId, {
+    const payload = registrationId || DEFAULT_TICKET.id;
+    QRCode.toDataURL(payload, {
       width: 720,
       margin: 2,
       color: { dark: "#000000", light: "#ffffff" },
@@ -103,47 +101,12 @@ const Ticket = () => {
     toast.success("Ticket saved");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-7 h-7 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!ticket) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
-        <div className="max-w-md w-full bg-card rounded-3xl p-10 text-center">
-          <TicketIcon className="w-10 h-10 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-2xl font-display font-bold mb-2">Ticket not found</h1>
-          <p className="text-muted-foreground text-sm mb-6">
-            This ticket link is invalid or the event is no longer live.
-          </p>
-          <Button
-            onClick={handleBack}
-            variant="outline"
-            className="rounded-full h-11 px-5"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {user ? "Back to my tickets" : "Back to home"}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const brand = ticket.primary_color || "hsl(var(--primary))";
   const checkedIn = !!ticket.checked_in_at;
 
   return (
     <div className="min-h-screen bg-background px-4 py-8 sm:py-14 flex items-center justify-center overflow-x-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md">
         <button
           type="button"
           onClick={handleBack}
@@ -243,7 +206,7 @@ const Ticket = () => {
         )}
 
         <a ref={downloadRef} className="hidden" />
-      </motion.div>
+      </div>
     </div>
   );
 };

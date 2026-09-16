@@ -11,8 +11,8 @@ export interface SectionTransitionConfig {
 }
 
 interface Props {
-  config: SectionTransitionConfig;
-  brandColor: string;
+  config?: SectionTransitionConfig;
+  brandColor?: string;
   /** Color hint of the section ABOVE this divider. Defaults to transparent (page bg). */
   fromColor?: string;
   /** Color hint of the section BELOW this divider. */
@@ -42,8 +42,8 @@ export function pickTransition(seedKey: string, index: number): SectionTransitio
 }
 
 export function SectionTransition({
-  config,
-  brandColor,
+  config = { kind: "gradient", seed: 0.5 },
+  brandColor = "#7C3AED",
   fromColor = "transparent",
   toColor = "transparent",
   compact = false,

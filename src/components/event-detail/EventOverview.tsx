@@ -29,13 +29,15 @@ import { getRegistrationUrl, getPublicOrigin } from "@/lib/publicUrl";
 import { copyToClipboard } from "@/lib/clipboard";
 import { toast } from "sonner";
 
+import { DEFAULT_EVENT, noop } from "@/lib/component-defaults";
+
 interface Props {
-  event: Tables<"events">;
-  onJumpTab: (tab: string) => void;
+  event?: Tables<"events">;
+  onJumpTab?: (tab: string) => void;
 }
 
-export default function EventOverview({ event, onJumpTab }: Props) {
-  const { data: registrations, isLoading } = useRegistrationsByEvent(event.id);
+export default function EventOverview({ event = DEFAULT_EVENT, onJumpTab = noop }: Props) {
+  const { data: registrations } = useRegistrationsByEvent(event.id);
   const { data: formFields } = useFormFields(event.id);
   const { data: modules } = useEventModules(event.id);
   const updateEvent = useUpdateEvent();
@@ -121,19 +123,19 @@ export default function EventOverview({ event, onJumpTab }: Props) {
         <KpiCard
           icon={<Users className="w-4 h-4" />}
           label="Registered"
-          value={isLoading ? "—" : stats.total.toString()}
+          value={stats.total.toString()}
           sub={capacity ? `of ${capacity}` : "no cap"}
         />
         <KpiCard
           icon={<TrendingUp className="w-4 h-4" />}
           label="This week"
-          value={isLoading ? "—" : `+${stats.thisWeek}`}
+          value={`+${stats.thisWeek}`}
           sub="last 7 days"
         />
         <KpiCard
           icon={<CheckCircle2 className="w-4 h-4" />}
           label="Checked in"
-          value={isLoading ? "—" : stats.checkedIn.toString()}
+          value={stats.checkedIn.toString()}
           sub={stats.waitlisted > 0 ? `${stats.waitlisted} waitlisted` : "—"}
         />
         <KpiCard
@@ -178,11 +180,6 @@ export default function EventOverview({ event, onJumpTab }: Props) {
             <span className="text-xs text-muted-foreground">{stats.total} total</span>
           </div>
           <div className="h-44">
-            {isLoading ? (
-              <div className="h-full flex items-center justify-center">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={stats.trend} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
                   <defs>
@@ -217,7 +214,6 @@ export default function EventOverview({ event, onJumpTab }: Props) {
                   />
                 </AreaChart>
               </ResponsiveContainer>
-            )}
           </div>
         </div>
 
@@ -276,11 +272,7 @@ export default function EventOverview({ event, onJumpTab }: Props) {
               </button>
             )}
           </div>
-          {isLoading ? (
-            <div className="py-6 flex justify-center">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : stats.recent.length === 0 ? (
+          {stats.recent.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
               No registrations yet. Share your event to start collecting sign-ups.
             </div>

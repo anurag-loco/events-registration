@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Download, Loader2, ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight, Star, UserCheck, ArrowUpFromLine } from "lucide-react";
+import { Search, Download, ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight, Star, UserCheck, ArrowUpFromLine } from "lucide-react";
 import { useRegistrationsByEvent, useUpdateRegistration, usePromoteFromWaitlist, RegStatus } from "@/hooks/useRegistrations";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -42,13 +42,13 @@ type SortColumn = "name" | "email" | "status" | "date";
 type SortDir = "asc" | "desc";
 const PAGE_SIZE = 15;
 
-export default function EventAttendeesTable({ eventId }: { eventId: string }) {
+export default function EventAttendeesTable({ eventId = "" }: { eventId?: string }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [sortColumn, setSortColumn] = useState<SortColumn>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-  const { data: registrations, isLoading } = useRegistrationsByEvent(eventId);
+  const { data: registrations } = useRegistrationsByEvent(eventId);
   const updateReg = useUpdateRegistration();
   const promote = usePromoteFromWaitlist();
 
@@ -196,9 +196,7 @@ export default function EventAttendeesTable({ eventId }: { eventId: string }) {
         })}
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-primary" /></div>
-      ) : paged.length > 0 ? (
+      {paged.length > 0 ? (
         <>
           <div className="rounded-xl overflow-x-auto">
             <Table>

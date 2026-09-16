@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate, useParams } from "react-router-dom";
-import { Loader2, Trash2, Sun, Moon } from "lucide-react";
+import { Trash2, Sun, Moon } from "lucide-react";
 import { useEvent, useUpdateEvent, useDeleteEvent, useEventEmailConfig } from "@/hooks/useEvents";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ import EventOverview from "@/components/event-detail/EventOverview";
 import EventSideNav, { type EventSection } from "@/components/event-detail/EventSideNav";
 import TicketTiersManager, { type TicketTier } from "@/components/event-detail/TicketTiersManager";
 import { getRegistrationUrl } from "@/lib/publicUrl";
+import { DEFAULT_EVENT } from "@/lib/component-defaults";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +40,8 @@ import {
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: event, isLoading } = useEvent(id);
+  const { data: fetched } = useEvent(id);
+  const event = fetched ?? { ...DEFAULT_EVENT, id: id || DEFAULT_EVENT.id };
   const { data: formFields } = useFormFields(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
@@ -60,15 +62,6 @@ const EventDetail = () => {
     if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["event-email-config", id] });
   };
-
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
-  }
-
-  if (!event) {
-    return <div className="text-center py-20"><p className="text-muted-foreground">Event not found.</p></div>;
-  }
 
   const handleStatusChange = async (status: "draft" | "live" | "past") => {
     await updateEvent.mutateAsync({ id: event.id, status });

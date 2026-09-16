@@ -1,4 +1,4 @@
-import { Users, TrendingUp, CalendarDays, Loader2 } from "lucide-react";
+import { Users, TrendingUp, CalendarDays } from "lucide-react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { format, parseISO, startOfWeek } from "date-fns";
 
 const Analytics = () => {
-  const { data: stats, isLoading } = useRegistrationStats();
+  const { data: stats } = useRegistrationStats();
 
   const perEventData = useMemo(() => {
     if (!stats?.events || !stats?.registrations) return [];
@@ -30,10 +30,6 @@ const Analytics = () => {
     });
     return Object.entries(weekMap).map(([week, count]) => ({ week, registrations: count }));
   }, [stats]);
-
-  if (isLoading) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
-  }
 
   const statCards = [
     { label: "Total registrations", value: stats?.total ?? 0, icon: Users },

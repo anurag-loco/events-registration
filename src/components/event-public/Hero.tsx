@@ -2,12 +2,18 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { useRef } from "react";
 import { CalendarDays, MapPin, Video, Globe, ChevronDown } from "lucide-react";
 import type { Event } from "@/hooks/useEvents";
+import {
+  DEFAULT_BRAND_COLOR,
+  DEFAULT_EVENT,
+  DEFAULT_FORMATTED_DATE,
+  noop,
+} from "@/lib/component-defaults";
 
 interface Props {
-  event: Event;
-  brandColor: string;
-  formattedDate: string;
-  onRegisterClick: () => void;
+  event?: Event;
+  brandColor?: string;
+  formattedDate?: string;
+  onRegisterClick?: () => void;
 }
 
 /**
@@ -15,7 +21,12 @@ interface Props {
  * slow Ken-Burns scale, layered scrim, and parallax title. If no image exists, a
  * brand-tinted gradient stage is rendered instead — never an empty box.
  */
-export function Hero({ event, brandColor, formattedDate, onRegisterClick }: Props) {
+export function Hero({
+  event = DEFAULT_EVENT,
+  brandColor = DEFAULT_BRAND_COLOR,
+  formattedDate = DEFAULT_FORMATTED_DATE,
+  onRegisterClick = noop,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
@@ -83,10 +94,7 @@ export function Hero({ event, brandColor, formattedDate, onRegisterClick }: Prop
         className="relative h-full flex flex-col justify-end px-5 sm:px-10 lg:px-16 pb-16 sm:pb-20 lg:pb-24 max-w-[1400px] mx-auto"
         style={reduce ? undefined : { y: titleY, opacity: titleOpacity }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 28, filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        <div
           className="max-w-4xl"
         >
           {formattedDate && (
@@ -124,18 +132,15 @@ export function Hero({ event, brandColor, formattedDate, onRegisterClick }: Prop
               {locationLabel}
             </span>
           </div>
-        </motion.div>
+        </div>
 
         {!reduce && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 8, 0] }}
-            transition={{ opacity: { delay: 1.4, duration: 0.8 }, y: { delay: 1.6, duration: 2.2, repeat: Infinity, ease: "easeInOut" } }}
-            className="hidden sm:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-1 text-white/65 text-[10px] tracking-[0.25em] uppercase"
+          <div
+            className="hidden sm:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-1 text-white/65 text-[10px] tracking-[0.25em] uppercase animate-bounce"
           >
             Scroll
             <ChevronDown className="w-4 h-4" />
-          </motion.div>
+          </div>
         )}
       </motion.div>
     </section>

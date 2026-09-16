@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_MODULES } from "@/lib/component-defaults";
 
 export type ModuleType =
   | "why_attend"
@@ -26,16 +28,17 @@ const KEY = (eventId: string) => ["event_modules", eventId];
 export function useEventModules(eventId: string | undefined) {
   return useQuery({
     queryKey: KEY(eventId || ""),
-    enabled: !!eventId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("event_modules" as any)
-        .select("*")
-        .eq("event_id", eventId!)
-        .order("position", { ascending: true });
-      if (error) throw error;
-      return (data || []) as unknown as EventModule[];
-    },
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("event_modules" as any)
+          .select("*")
+          .eq("event_id", eventId!)
+          .order("position", { ascending: true });
+        if (error) throw error;
+        return (data || []) as unknown as EventModule[];
+      }, DEFAULT_MODULES),
+    placeholderData: DEFAULT_MODULES,
   });
 }
 

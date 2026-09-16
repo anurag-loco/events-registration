@@ -8,8 +8,8 @@ export type TicketTier = { id: string; name: string; price: string };
 const SUGGESTIONS = ["General Admission", "Early Bird", "VIP", "Student", "Group"];
 
 interface Props {
-  tiers: TicketTier[];
-  onChange: (tiers: TicketTier[]) => void;
+  tiers?: TicketTier[];
+  onChange?: (tiers: TicketTier[]) => void;
 }
 
 const newId = () =>
@@ -17,7 +17,12 @@ const newId = () =>
     ? (crypto as any).randomUUID()
     : `t_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
 
-export function TicketTiers({ tiers, onChange }: Props) {
+const DEFAULT_TIERS: TicketTier[] = [
+  { id: "preview-ga", name: "General Admission", price: "25" },
+  { id: "preview-vip", name: "VIP", price: "75" },
+];
+
+export function TicketTiers({ tiers = DEFAULT_TIERS, onChange = () => {} }: Props) {
   const update = (id: string, patch: Partial<TicketTier>) => {
     onChange(tiers.map(t => (t.id === id ? { ...t, ...patch } : t)));
   };

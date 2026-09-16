@@ -4,7 +4,7 @@ import { type ReactNode } from "react";
 type Direction = "up" | "down" | "left" | "right" | "none";
 
 interface RevealProps extends Omit<HTMLMotionProps<"div">, "children"> {
-  children: ReactNode;
+  children?: ReactNode;
   delay?: number;
   duration?: number;
   y?: number;
@@ -25,7 +25,7 @@ const offset = (dir: Direction, mag: number) => {
 };
 
 export function Reveal({
-  children,
+  children = null,
   delay = 0,
   duration = 0.7,
   y,
@@ -66,12 +66,12 @@ export const staggerItem: Variants = {
 };
 
 export function StaggerGroup({
-  children,
-  className,
+  children = null,
+  className = "",
   amount = 0.2,
   once = true,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   amount?: number;
   once?: boolean;
@@ -89,7 +89,7 @@ export function StaggerGroup({
   );
 }
 
-export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
+export function StaggerItem({ children = null, className = "" }: { children?: ReactNode; className?: string }) {
   return (
     <motion.div className={className} variants={staggerItem}>
       {children}

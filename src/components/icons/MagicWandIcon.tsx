@@ -5,7 +5,7 @@ interface Props {
 }
 
 /** Custom on-brand "enhance" icon: a tilted magic wand with a trailing spark. */
-export function MagicWandIcon({ className }: Props) {
+export function MagicWandIcon({ className = "" }: Props) {
   return (
     <svg
       viewBox="0 0 24 24"

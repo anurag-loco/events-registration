@@ -63,14 +63,14 @@ const GROUPS: NavGroup[] = [
 ];
 
 interface Props {
-  active: EventSection;
-  onChange: (s: EventSection) => void;
+  active?: EventSection;
+  onChange?: (s: EventSection) => void;
   attendeesCount?: number;
 }
 
 const STORAGE_KEY = "eventDetailSidebarCollapsed";
 
-export default function EventSideNav({ active, onChange, attendeesCount }: Props) {
+export default function EventSideNav({ active = "overview", onChange = () => {}, attendeesCount = 0 }: Props) {
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem(STORAGE_KEY) === "1";

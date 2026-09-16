@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Download, Loader2, ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRegistrations, Registration } from "@/hooks/useRegistrations";
 import { useRegistrationStats } from "@/hooks/useRegistrations";
 import { format } from "date-fns";
@@ -30,7 +30,7 @@ const Attendees = () => {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
-  const { data: registrations, isLoading } = useRegistrations();
+  const { data: registrations } = useRegistrations();
   const { data: stats } = useRegistrationStats();
 
   const eventOptions = useMemo(() => {
@@ -172,9 +172,7 @@ const Attendees = () => {
         </Select>
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
-      ) : paged.length > 0 ? (
+      {paged.length > 0 ? (
         <>
           <div className="bg-card rounded-xl overflow-x-auto">
             <Table>

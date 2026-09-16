@@ -32,9 +32,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { copyToClipboard } from "@/lib/clipboard";
 
 interface Props {
-  eventSlug: string;
-  eventId: string;
-  eventName: string;
+  eventSlug?: string;
+  eventId?: string;
+  eventName?: string;
 }
 
 const SOURCE_PRESETS = ["paid", "internal", "partner", "organic", "social", "email", "other"];
@@ -70,7 +70,11 @@ const TAB_FOR_ID: Record<string, Tab> = {
   "promo-attribution": "insights",
 };
 
-export default function EventPromotion({ eventSlug, eventId, eventName }: Props) {
+export default function EventPromotion({
+  eventSlug = "summer-showcase",
+  eventId = "",
+  eventName = "Summer Showcase",
+}: Props) {
   const { data: registrations } = useRegistrationsByEvent(eventId);
   const { data: links = [] } = useTrackingLinks(eventId);
   const createLink = useCreateTrackingLink();

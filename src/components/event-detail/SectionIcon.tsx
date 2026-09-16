@@ -116,7 +116,12 @@ const MAP: Record<ModuleType, React.FC<IconProps>> = {
   custom: CustomIcon,
 };
 
-export default function SectionIcon({ type, color, size, animated = true }: { type: ModuleType; color: string; size?: number; animated?: boolean }) {
+export default function SectionIcon({
+  type = "why_attend",
+  color = "#7C3AED",
+  size = 28,
+  animated = true,
+}: { type?: ModuleType; color?: string; size?: number; animated?: boolean }) {
   const Cmp = MAP[type] || CustomIcon;
   return <Cmp color={color} size={size} animated={animated} />;
 }

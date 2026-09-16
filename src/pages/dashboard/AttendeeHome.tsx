@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useMyTickets, useBrowseEvents } from "@/hooks/useMyTickets";
 import { useProfile } from "@/hooks/useProfile";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, MapPin, Ticket, ArrowRight } from "lucide-react";
 
 function formatDate(iso: string | null) {
@@ -18,9 +17,9 @@ function formatDate(iso: string | null) {
 
 export default function AttendeeHome() {
   const { data: profile } = useProfile();
-  const { data: tickets, isLoading: ticketsLoading } = useMyTickets();
+  const { data: tickets } = useMyTickets();
   const excludeIds = (tickets ?? []).map((t) => t.event_id);
-  const { data: browse, isLoading: browseLoading } = useBrowseEvents(excludeIds);
+  const { data: browse } = useBrowseEvents(excludeIds);
 
   const firstName = profile?.full_name?.split(" ")[0];
 
@@ -43,11 +42,7 @@ export default function AttendeeHome() {
           )}
         </div>
 
-        {ticketsLoading ? (
-          <div className="grid gap-3">
-            {[0, 1].map((i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
-          </div>
-        ) : tickets && tickets.length > 0 ? (
+        {tickets && tickets.length > 0 ? (
           <ul className="grid gap-3">
             {tickets.map((t) => (
               <li key={t.registration_id} className="min-w-0">
@@ -89,11 +84,7 @@ export default function AttendeeHome() {
       <section className="space-y-4">
         <h2 className="font-display text-xl sm:text-2xl tracking-[-0.02em]">Browse events</h2>
 
-        {browseLoading ? (
-          <div className="grid sm:grid-cols-2 gap-3">
-            {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-2xl" />)}
-          </div>
-        ) : browse && browse.length > 0 ? (
+        {browse && browse.length > 0 ? (
           <ul className="grid sm:grid-cols-2 gap-3">
             {browse.map((e) => (
               <li key={e.id} className="min-w-0">

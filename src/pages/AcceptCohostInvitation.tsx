@@ -6,34 +6,48 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, AlertCircle, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
+import { isSupabaseConfigured } from "@/lib/supabase-ready";
+import { DEFAULT_EVENT, DEFAULT_PROFILE } from "@/lib/component-defaults";
+
+const DEFAULT_INVITE = {
+  inviter_name: DEFAULT_PROFILE.full_name,
+  inviter_company: DEFAULT_PROFILE.company,
+  event_name: DEFAULT_EVENT.name,
+  email: "you@example.com",
+  status: "pending",
+  scope: "event",
+};
 
 const AcceptCohostInvitation = () => {
   const [params] = useSearchParams();
   const token = params.get("token") || "";
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
-  const [info, setInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const [info, setInfo] = useState<any>(DEFAULT_INVITE);
   const [error, setError] = useState<string | null>(null);
   const [accepting, setAccepting] = useState(false);
   const [accepted, setAccepted] = useState<{ event_id: string | null; scope: string } | null>(null);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
     if (!token) {
       setError("Missing invitation token.");
-      setLoading(false);
       return;
     }
     (async () => {
-      const { data, error } = await supabase.rpc("get_cohost_invitation" as any, { _token: token } as any);
-      if (error) {
-        setError(error.message);
-      } else if (!data) {
-        setError("Invitation not found.");
-      } else {
-        setInfo(data as any);
+      try {
+        const { data, error } = await supabase.rpc("get_cohost_invitation" as any, { _token: token } as any);
+        if (error) {
+          setError(error.message);
+        } else if (!data) {
+          setError("Invitation not found.");
+        } else {
+          setInfo(data as any);
+          setError(null);
+        }
+      } catch (e: any) {
+        setError(e?.message || "Could not load this invitation.");
       }
-      setLoading(false);
     })();
   }, [token]);
 
@@ -49,10 +63,6 @@ const AcceptCohostInvitation = () => {
     setAccepted(result);
     toast.success("Invitation accepted!");
   };
-
-  if (loading || authLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
-  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">

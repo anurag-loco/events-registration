@@ -10,14 +10,14 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AICoverImageDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  eventName: string;
-  description: string;
-  eventType: string;
-  template: string;
-  locationType: string;
-  onAccept: (url: string) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  eventName?: string;
+  description?: string;
+  eventType?: string;
+  template?: string;
+  locationType?: string;
+  onAccept?: (url: string) => void;
 }
 
 const buildAutoPrompt = (
@@ -46,7 +46,14 @@ const TEMPLATE_ASPECT: Record<string, { aspect: string; label: string }> = {
 };
 
 export const AICoverImageDialog = ({
-  open, onOpenChange, eventName, description, eventType, template, locationType, onAccept,
+  open = true,
+  onOpenChange = () => {},
+  eventName = "Summer Showcase",
+  description = "An evening of talks, music, and connection with the community.",
+  eventType = "conference",
+  template = "minimal",
+  locationType = "physical",
+  onAccept = () => {},
 }: AICoverImageDialogProps) => {
   const [prompt, setPrompt] = useState("");
   const [generating, setGenerating] = useState(false);

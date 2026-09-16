@@ -3,7 +3,7 @@ import { SVGProps } from "react";
 /**
  * Stack of polaroid photos — used for AI image generation entry points.
  */
-export const PolaroidIcon = ({ className, ...props }: SVGProps<SVGSVGElement>) => (
+export const PolaroidIcon = ({ className = "", ...props }: SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"

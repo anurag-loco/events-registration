@@ -22,6 +22,7 @@ import "react-phone-number-input/style.css";
 import { AuroraBackdrop, GlassCard } from "@/components/register/AuroraBackdrop";
 import type { TicketTier } from "@/components/event-detail/TicketTiersManager";
 import { Crown, Ticket as TicketIcon, Check, Minus, Plus } from "lucide-react";
+import { DEFAULT_EVENT, DEFAULT_FORM_FIELDS, DEFAULT_MODULES } from "@/lib/component-defaults";
 
 type FormField = Tables<"form_fields">;
 
@@ -214,15 +215,15 @@ function formatEventDateTime(event: Event) {
 // ─── Extracted stable components ───
 
 const SuccessCard = ({ brandColor, eventName, waitlisted, isDark }: { brandColor: string; eventName: string; waitlisted: boolean; isDark?: boolean }) => (
-  <motion.div key="success" initial={{ opacity: 0, scale: 0.92, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: "spring", damping: 18 }} className="w-full max-w-lg mx-auto relative z-10">
+  <div className="w-full max-w-lg mx-auto relative z-10">
     <GlassCard isDark={isDark} brandColor={brandColor}>
       <div className="p-10 text-center">
-        <motion.div initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", delay: 0.2, damping: 12 }} className="relative inline-block mb-5">
+        <div className="relative inline-block mb-5">
           <div className="absolute inset-0 blur-2xl rounded-full" style={{ background: brandColor, opacity: 0.5 }} />
           <div className="relative w-20 h-20 rounded-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${brandColor}, hsl(265 90% 65%))`, boxShadow: `0 12px 40px -8px ${brandColor}88` }}>
             {waitlisted ? <Clock className="w-9 h-9 text-white" /> : <CheckCircle2 className="w-9 h-9 text-white" />}
           </div>
-        </motion.div>
+        </div>
         <h2 className="text-3xl font-display font-bold mb-3 tracking-[-0.02em]">
           {waitlisted ? "You're on the waitlist" : "You're registered"}
         </h2>
@@ -233,7 +234,7 @@ const SuccessCard = ({ brandColor, eventName, waitlisted, isDark }: { brandColor
         </p>
       </div>
     </GlassCard>
-  </motion.div>
+  </div>
 );
 
 const EventInfo = ({ event, className = "" }: { event: Event; className?: string }) => {
@@ -375,11 +376,7 @@ const RegistrationForm = ({
       </div>
 
       {isPaid && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3"
-        >
+        <div className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3">
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground">Order total</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -389,7 +386,7 @@ const RegistrationForm = ({
           <div className="text-2xl font-display font-bold tabular-nums tracking-[-0.02em]" style={{ color: brandColor }}>
             {formatTicketPrice(subtotal, selectedTicket!.currency || "USD")}
           </div>
-        </motion.div>
+        </div>
       )}
 
       <div className="flex items-start gap-2.5 pt-1">
@@ -434,9 +431,10 @@ const PoweredBy = () => (
 const Register = () => {
   const { slug, variant } = useParams();
   const navigate = useNavigate();
-  const { data: event, isLoading: eventLoading } = useEventBySlug(slug);
-  const { data: modules = [], isLoading: modulesLoading } = useEventModules(event?.id);
-  const { data: formFields, isLoading: fieldsLoading } = useFormFields(event?.id);
+  const { data: fetchedEvent } = useEventBySlug(slug);
+  const event = fetchedEvent ?? { ...DEFAULT_EVENT, slug: slug || DEFAULT_EVENT.slug };
+  const { data: modules = DEFAULT_MODULES } = useEventModules(event.id);
+  const { data: formFields = DEFAULT_FORM_FIELDS } = useFormFields(event.id);
   const createReg = useCreateRegistration();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [consent, setConsent] = useState(false);
@@ -476,27 +474,6 @@ const Register = () => {
   const handleFieldChange = useCallback((label: string, value: string) => {
     setFormData(prev => ({ ...prev, [label]: value }));
   }, []);
-
-  if (eventLoading || fieldsLoading || modulesLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <h1 className="text-2xl font-display font-bold mb-2">Event Not Found</h1>
-            <p className="text-muted-foreground">This event may have ended or the link is invalid.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -562,7 +539,6 @@ const Register = () => {
   };
 
   const brandColor = event.primary_color || "#7C3AED";
-  const isDark = (event as any).color_mode === "dark";
 
   const formProps = {
     formFields,
@@ -584,17 +560,15 @@ const Register = () => {
 
   if (submitted) {
     return (
-      <div className={isDark ? "dark" : ""}>
-        <div className="min-h-screen relative flex items-center justify-center px-4 py-12 text-foreground overflow-hidden bg-background">
-          <AuroraBackdrop brandColor={brandColor} isDark={isDark} />
-          <SuccessCard brandColor={brandColor} eventName={event.name} waitlisted={waitlisted} isDark={isDark} />
-        </div>
+      <div className="min-h-screen relative flex items-center justify-center px-4 py-12 text-foreground overflow-hidden bg-white">
+        <AuroraBackdrop brandColor={brandColor} isDark={false} variant="soft" />
+        <SuccessCard brandColor={brandColor} eventName={event.name} waitlisted={waitlisted} isDark={false} />
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden bg-white">
       {isPreview && (
         <div className="sticky top-0 z-50 w-full bg-foreground text-background text-center text-xs sm:text-sm py-2 px-4 font-medium">
           Preview mode — this event is a {event.status === "draft" ? "draft" : event.status}. Registrations are disabled until you publish.
@@ -604,7 +578,7 @@ const Register = () => {
         event={event}
         modules={modules}
         brandColor={brandColor}
-        isDark={isDark}
+        isDark={false}
         formattedDate={event.event_date ? formatEventDateTime(event) : ""}
         formSlot={<RegistrationForm {...formProps} className="pb-24 sm:pb-0" />}
       />

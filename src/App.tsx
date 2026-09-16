@@ -35,7 +35,18 @@ import LandingEditor from "./pages/dashboard/LandingEditor";
 import NotFound from "./pages/NotFound";
 import AcceptCohostInvitation from "./pages/AcceptCohostInvitation";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 0,
+      refetchOnWindowFocus: false,
+      staleTime: 30_000,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 function ScrollToTop() {
   const { pathname } = useLocation();

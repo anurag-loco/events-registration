@@ -25,9 +25,9 @@ interface LibraryRow {
 }
 
 interface Props {
-  value: string | null;
-  onChange: (url: string | null) => void;
-  eventId: string;
+  value?: string | null;
+  onChange?: (url: string | null) => void;
+  eventId?: string;
   tag?: string;
   template?: "minimal" | "split" | "landing" | "square" | "section";
   promptSeed?: string;
@@ -44,12 +44,13 @@ interface Props {
 }
 
 export default function SmartImageField({
-  value, onChange, eventId,
-  tag, template = "minimal", promptSeed = "",
+  value = null, onChange = () => {}, eventId = "",
+  tag = "", template = "minimal", promptSeed = "",
   aspectClass = "aspect-[16/10]",
-  styleSeedUrl,
-  className, emptyLabel = "Drop an image, click to upload, or generate with AI",
-  position, onPositionChange, scale, onScaleChange,
+  styleSeedUrl = "",
+  className = "",
+  emptyLabel = "Drop an image, click to upload, or generate with AI",
+  position = null, onPositionChange, scale = null, onScaleChange,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [selectedValue, setSelectedValue] = useState<string | null>(value);

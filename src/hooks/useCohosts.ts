@@ -1,20 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { withFallback } from "@/lib/supabase-ready";
 
 export function useInvitations() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["cohost-invitations", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cohost_invitations" as any)
-        .select("id, email, scope, event_id, status, created_at, expires_at, token, accepted_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as any[];
-    },
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("cohost_invitations" as any)
+          .select("id, email, scope, event_id, status, created_at, expires_at, token, accepted_at")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data as any[];
+      }, []),
+    placeholderData: [] as any[],
   });
 }
 
@@ -22,15 +24,18 @@ export function useCohosts() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["cohosts", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cohosts" as any)
-        .select("id, owner_id, cohost_user_id, event_id, created_at")
-        .eq("owner_id", user!.id);
-      if (error) throw error;
-      return data as any[];
+    queryFn: () => {
+      if (!user) return Promise.resolve([] as any[]);
+      return withFallback(async () => {
+        const { data, error } = await supabase
+          .from("cohosts" as any)
+          .select("id, owner_id, cohost_user_id, event_id, created_at")
+          .eq("owner_id", user.id);
+        if (error) throw error;
+        return data as any[];
+      }, []);
     },
+    placeholderData: [] as any[],
   });
 }
 

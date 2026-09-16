@@ -15,10 +15,10 @@ type Result =
   | { kind: "error"; message: string };
 
 interface Props {
-  eventId: string;
+  eventId?: string;
 }
 
-export default function CheckInScanner({ eventId }: Props) {
+export default function CheckInScanner({ eventId = "" }: Props) {
   const containerId = "checkin-qr-region";
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);

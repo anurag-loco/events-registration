@@ -1,29 +1,40 @@
 import { Calendar, MapPin, Video, Globe, ArrowRight } from "lucide-react";
 
 interface TemplatePreviewProps {
-  template: string;
-  eventName: string;
-  description: string;
-  startDate: string;
-  startTime: string;
-  locationType: "virtual" | "physical" | "hybrid";
-  locationValue: string;
-  locationAddress: string;
-  flyerUrl: string | null;
+  template?: string;
+  eventName?: string;
+  description?: string;
+  startDate?: string;
+  startTime?: string;
+  locationType?: "virtual" | "physical" | "hybrid";
+  locationValue?: string;
+  locationAddress?: string;
+  flyerUrl?: string | null;
   colorMode?: "light" | "dark";
 }
 
-const TemplatePreview = (p: TemplatePreviewProps) => {
-  const light = p.colorMode === "light";
+const TemplatePreview = ({
+  template = "split",
+  eventName = "Summer Showcase",
+  description = "Join us for an evening worth remembering.",
+  startDate = "Sat, Oct 12",
+  startTime = "6:00 PM",
+  locationType = "physical",
+  locationValue = "Brooklyn, NY",
+  locationAddress = "Brooklyn, NY",
+  flyerUrl = null,
+  colorMode = "dark",
+}: TemplatePreviewProps) => {
+  const light = colorMode === "light";
   const background = light ? "#fff" : "#1d1d1f";
   const foreground = light ? "#19192e" : "#f7f7f8";
   const muted = light ? "#555563" : "#b8b8c2";
   const border = light ? "#e5e5e8" : "#44444b";
-  const eventName = p.eventName || "Event Name";
+  const locationLabel = locationValue || locationAddress || locationType;
 
   return (
     <div
-      data-template={p.template || "split"}
+      data-template={template}
       style={{
         boxSizing: "border-box",
         width: "100%",
@@ -41,9 +52,9 @@ const TemplatePreview = (p: TemplatePreviewProps) => {
     >
       <div style={{ minWidth: 0 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          {p.flyerUrl && (
+          {flyerUrl && (
             <img
-              src={p.flyerUrl}
+              src={flyerUrl}
               alt="Event flyer"
               style={{ width: 72, height: 72, flex: "0 0 auto", borderRadius: 6, objectFit: "cover" }}
             />
@@ -53,13 +64,13 @@ const TemplatePreview = (p: TemplatePreviewProps) => {
               {eventName}
             </div>
             <p style={{ fontSize: 10, color: muted, lineHeight: 1.35, margin: "7px 0 0", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-              {p.description || "Join us for an evening worth remembering."}
+              {description}
             </p>
           </div>
         </div>
         <div style={{ display: "grid", gap: 6, color: muted, fontSize: 9, marginTop: 14 }}>
-          {p.startDate && <span style={{ display: "flex", gap: 5, alignItems: "center" }}><Calendar size={11} />{p.startDate} {p.startTime}</span>}
-          {p.locationType && <span style={{ display: "flex", gap: 5, alignItems: "center" }}>{p.locationType === "virtual" ? <Video size={11} /> : p.locationType === "physical" ? <MapPin size={11} /> : <Globe size={11} />}<span style={{ textTransform: "capitalize" }}>{p.locationType}</span></span>}
+          {startDate && <span style={{ display: "flex", gap: 5, alignItems: "center" }}><Calendar size={11} />{startDate} {startTime}</span>}
+          {locationType && <span style={{ display: "flex", gap: 5, alignItems: "center" }}>{locationType === "virtual" ? <Video size={11} /> : locationType === "physical" ? <MapPin size={11} /> : <Globe size={11} />}<span>{locationLabel}</span></span>}
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface Props {
-  brandColor: string;
+  brandColor?: string;
   isDark?: boolean;
   variant?: "full" | "soft";
 }
@@ -11,7 +11,7 @@ interface Props {
  * Three drifting blobs in brand color + supporting hues, on a deep gradient base.
  * Uses radial-gradients + motion + a subtle film grain for premium feel.
  */
-export function AuroraBackdrop({ brandColor, isDark = false, variant = "full" }: Props) {
+export function AuroraBackdrop({ brandColor = "#7C3AED", isDark = false, variant = "full" }: Props) {
   // Base canvas: deep indigo→violet for dark, soft cream for light.
   const base = isDark
     ? "radial-gradient(at 20% 0%, hsl(260 60% 12%) 0%, transparent 50%), radial-gradient(at 80% 100%, hsl(220 50% 8%) 0%, transparent 50%), linear-gradient(180deg, hsl(250 35% 6%), hsl(240 40% 4%))"
@@ -113,12 +113,12 @@ export function AuroraBackdrop({ brandColor, isDark = false, variant = "full" }:
  * Glass card — frosted, layered, gradient-ring border. Drop-in for <Card>.
  */
 export function GlassCard({
-  children,
+  children = null,
   className = "",
   isDark = false,
-  brandColor,
+  brandColor = "#7C3AED",
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   isDark?: boolean;
   brandColor?: string;

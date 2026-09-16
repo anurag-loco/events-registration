@@ -38,9 +38,9 @@ const TYPE_META: Record<ModuleType, { label: string }> = {
 };
 
 interface Props {
-  eventId: string;
+  eventId?: string;
   eventSlug?: string | null;
-  eventName: string;
+  eventName?: string;
   description?: string | null;
   eventDate?: string | null;
   locationType?: string | null;
@@ -48,7 +48,16 @@ interface Props {
   coverImageUrl?: string | null;
 }
 
-export default function EventPageBuilder({ eventId, eventSlug, eventName, description, eventDate, locationType, brandColor = "#7C3AED", coverImageUrl }: Props) {
+export default function EventPageBuilder({
+  eventId = "",
+  eventSlug = "summer-showcase",
+  eventName = "Summer Showcase",
+  description = "An evening of talks, music, and connection with the community.",
+  eventDate = null,
+  locationType = "physical",
+  brandColor = "#7C3AED",
+  coverImageUrl = null,
+}: Props) {
   const { data: modules = [], refetch } = useEventModules(eventId);
   const add = useAddModule();
   const reorder = useReorderModules();

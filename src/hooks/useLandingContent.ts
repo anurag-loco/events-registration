@@ -5,6 +5,8 @@ import {
   type LandingContentMap,
   type LandingSectionKey,
 } from "@/lib/landing-defaults";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_LANDING } from "@/lib/component-defaults";
 
 export interface LandingSectionRow {
   section_key: LandingSectionKey;
@@ -16,37 +18,35 @@ export interface LandingSectionRow {
 export function useLandingContent() {
   return useQuery({
     queryKey: ["landing-sections"],
-    queryFn: async (): Promise<{
-      content: LandingContentMap;
-      assets: Record<LandingSectionKey, { url: string; role?: string }[]>;
-    }> => {
-      const { data, error } = await supabase
-        .from("landing_sections")
-        .select("section_key, content, assets, updated_at");
-      if (error) throw error;
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("landing_sections")
+          .select("section_key, content, assets, updated_at");
+        if (error) throw error;
 
-      const content = { ...LANDING_DEFAULTS } as LandingContentMap;
-      const assets = {
-        hero: [],
-        popular_events: [],
-        features: [],
-        testimonials: [],
-        cta: [],
-      } as Record<LandingSectionKey, { url: string; role?: string }[]>;
+        const content = { ...LANDING_DEFAULTS } as LandingContentMap;
+        const assets = {
+          hero: [],
+          popular_events: [],
+          features: [],
+          testimonials: [],
+          cta: [],
+        } as Record<LandingSectionKey, { url: string; role?: string }[]>;
 
-      for (const row of (data ?? []) as any[]) {
-        const key = row.section_key as LandingSectionKey;
-        if (key in content && row.content && Object.keys(row.content).length > 0) {
-          // shallow merge so partial saves still keep defaults
-          (content as any)[key] = { ...(content as any)[key], ...row.content };
+        for (const row of (data ?? []) as any[]) {
+          const key = row.section_key as LandingSectionKey;
+          if (key in content && row.content && Object.keys(row.content).length > 0) {
+            (content as any)[key] = { ...(content as any)[key], ...row.content };
+          }
+          if (key in assets && Array.isArray(row.assets)) {
+            assets[key] = row.assets;
+          }
         }
-        if (key in assets && Array.isArray(row.assets)) {
-          assets[key] = row.assets;
-        }
-      }
 
-      return { content, assets };
-    },
+        return { content, assets };
+      }, DEFAULT_LANDING),
+    placeholderData: DEFAULT_LANDING,
     staleTime: 30_000,
   });
 }

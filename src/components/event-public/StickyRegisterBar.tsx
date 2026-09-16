@@ -1,17 +1,22 @@
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
+import { DEFAULT_BRAND_COLOR, DEFAULT_EVENT_NAME, noop } from "@/lib/component-defaults";
 
 interface Props {
-  brandColor: string;
-  eventName: string;
-  onRegisterClick: () => void;
+  brandColor?: string;
+  eventName?: string;
+  onRegisterClick?: () => void;
 }
 
 /**
  * Sticky bottom (mobile) / top (desktop) register bar that springs in once the
  * hero scrolls out of view. Includes safe-area padding for iOS.
  */
-export function StickyRegisterBar({ brandColor, eventName, onRegisterClick }: Props) {
+export function StickyRegisterBar({
+  brandColor = DEFAULT_BRAND_COLOR,
+  eventName = DEFAULT_EVENT_NAME,
+  onRegisterClick = noop,
+}: Props) {
   const [show, setShow] = useState(false);
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (v) => {

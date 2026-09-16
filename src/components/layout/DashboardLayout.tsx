@@ -41,12 +41,12 @@ const attendeeNavItems = [
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children = null }: { children?: React.ReactNode }) {
   const mainRef = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
-  const { role, loading: roleLoading } = useUserRole();
+  const { role } = useUserRole();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -69,12 +69,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     navigate("/auth");
   };
 
-  // Hide nav until role resolves so attendees never flash organizer items.
-  const allItems = roleLoading || !role
-    ? []
-    : role === "organizer"
-      ? [...organizerNavItems, { title: "Company", url: "/dashboard/company", icon: Eye }]
-      : attendeeNavItems;
+  // Default to organizer nav so the shell renders before / without a live role.
+  const allItems =
+    role === "attendee"
+      ? attendeeNavItems
+      : [...organizerNavItems, { title: "Company", url: "/dashboard/company", icon: Eye }];
 
   const homeHref = role === "attendee" ? "/dashboard/home" : "/dashboard/events";
 

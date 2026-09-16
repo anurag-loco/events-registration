@@ -11,13 +11,19 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { useDuplicateEvent } from "@/hooks/useEvents";
 import { formatDistanceToNow, differenceInDays } from "date-fns";
 
+import { DEFAULT_EVENT, noop } from "@/lib/component-defaults";
+
 interface Props {
-  event: Tables<"events">;
-  onStatusChange: (status: "draft" | "live" | "past") => void;
-  onDelete: () => void;
+  event?: Tables<"events">;
+  onStatusChange?: (status: "draft" | "live" | "past") => void;
+  onDelete?: () => void;
 }
 
-export default function EventDetailHeader({ event, onStatusChange, onDelete }: Props) {
+export default function EventDetailHeader({
+  event = DEFAULT_EVENT,
+  onStatusChange = noop,
+  onDelete = noop,
+}: Props) {
   const navigate = useNavigate();
   const duplicate = useDuplicateEvent();
 

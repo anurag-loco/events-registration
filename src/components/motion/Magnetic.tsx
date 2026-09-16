@@ -6,11 +6,11 @@ import { useRef, type ReactNode, type MouseEvent } from "react";
  * Keep `strength` low (8-16) — eventspark prefers measured motion.
  */
 export function Magnetic({
-  children,
+  children = null,
   strength = 12,
-  className,
+  className = "",
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   strength?: number;
   className?: string;
 }) {

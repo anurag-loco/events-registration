@@ -19,9 +19,9 @@ export type TicketTier = {
 };
 
 interface Props {
-  tiers: TicketTier[];
+  tiers?: TicketTier[];
   currency?: string;
-  onChange: (tiers: TicketTier[]) => void;
+  onChange?: (tiers: TicketTier[]) => void;
 }
 
 const newTier = (currency: string): TicketTier => ({
@@ -43,7 +43,16 @@ const formatPrice = (price: number, currency = "USD") => {
   }
 };
 
-export default function TicketTiersManager({ tiers, currency = "USD", onChange }: Props) {
+const DEFAULT_TIERS: TicketTier[] = [
+  { id: "preview-ga", name: "General Admission", description: "Standard entry", price: 25, currency: "USD", capacity: null, is_vip: false },
+  { id: "preview-vip", name: "VIP", description: "Front-row access", price: 75, currency: "USD", capacity: 20, is_vip: true },
+];
+
+export default function TicketTiersManager({
+  tiers = DEFAULT_TIERS,
+  currency = "USD",
+  onChange = () => {},
+}: Props) {
   const [editing, setEditing] = useState<TicketTier | null>(null);
   const [isNew, setIsNew] = useState(false);
 

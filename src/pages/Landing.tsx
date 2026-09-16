@@ -8,9 +8,7 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/Reveal";
-import { Magnetic } from "@/components/motion/Magnetic";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Puzzle,
   ArrowRight,
@@ -231,47 +229,27 @@ function ConfettiLayer({ size, opacity, count, spread }: { size: number; opacity
           const color = CONFETTI_COLORS[seed.color % CONFETTI_COLORS.length];
           const shape = CONFETTI_SHAPES[seed.shape % CONFETTI_SHAPES.length];
 
-          const sharedMotion = {
-            initial: {
-              [corner.side]: corner.originX,
-              [corner.vSide]: Math.abs(corner.originY),
-              opacity: 0,
-              scale: 0,
-              rotate: 0,
-            },
-            animate: {
-              [corner.side]: finalX,
-              [corner.vSide]: finalY < 0 ? Math.abs(finalY) : finalY,
-              opacity,
-              scale: 1,
-              rotate: seed.rot,
-            },
-            transition: {
-              delay: 0.8 + si * 0.06 + ci * 0.04,
-              duration: 0.5,
-              type: "spring" as const,
-              stiffness: 200,
-              damping: 15,
-            },
+          const posStyle: React.CSSProperties = {
+            position: "absolute",
+            [corner.side]: finalX,
+            [corner.vSide]: finalY < 0 ? Math.abs(finalY) : finalY,
+            opacity,
+            transform: `rotate(${seed.rot}deg)`,
           };
 
-          const posStyle: React.CSSProperties = { position: "absolute" };
-
           if (shape === "circle") {
-            return <motion.div key={`${ci}-${si}`} {...sharedMotion} style={{ ...posStyle, width: s, height: s, borderRadius: "50%", backgroundColor: color }} />;
+            return <div key={`${ci}-${si}`} style={{ ...posStyle, width: s, height: s, borderRadius: "50%", backgroundColor: color }} />;
           }
           if (shape === "square") {
-            return <motion.div key={`${ci}-${si}`} {...sharedMotion} style={{ ...posStyle, width: s, height: s, borderRadius: 2, backgroundColor: color }} />;
+            return <div key={`${ci}-${si}`} style={{ ...posStyle, width: s, height: s, borderRadius: 2, backgroundColor: color }} />;
           }
           if (shape === "line") {
-            return <motion.div key={`${ci}-${si}`} {...sharedMotion} style={{ ...posStyle, width: s, height: s * 0.25, borderRadius: 99, backgroundColor: color }} />;
+            return <div key={`${ci}-${si}`} style={{ ...posStyle, width: s, height: s * 0.25, borderRadius: 99, backgroundColor: color }} />;
           }
-          // triangle
           const half = s / 2;
           return (
-            <motion.div
+            <div
               key={`${ci}-${si}`}
-              {...sharedMotion}
               style={{
                 ...posStyle,
                 width: 0,
@@ -406,11 +384,8 @@ const Landing = () => {
             {/* Confetti shapes behind cards — dynamic */}
             <ConfettiLayer size={confettiSize} opacity={confettiOpacity} count={confettiCount} spread={confettiSpread} />
             {/* Top-left card */}
-            <motion.div
+            <div
               className="hidden md:block absolute left-[-100px] lg:left-[-40px] top-[20px] w-[200px] lg:w-[260px]"
-              initial={{ opacity: 0, scale: 0.3, x: -80, y: -60 }}
-              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
             >
               <div className="rounded-2xl overflow-hidden shadow-lg rotate-[6deg]">
                 <img src={eventChill} alt="Chill code workshop" className="w-full h-[150px] object-cover" />
@@ -418,14 +393,11 @@ const Landing = () => {
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Workshop</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Bottom-left card */}
-            <motion.div
+            <div
               className="hidden md:block absolute left-[-120px] lg:left-[-60px] bottom-[20px] w-[200px] lg:w-[260px]"
-              initial={{ opacity: 0, scale: 0.3, x: -80, y: 60 }}
-              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.35 }}
             >
               <div className="rounded-2xl overflow-hidden shadow-lg rotate-[-5deg]">
                 <img src={eventJam} alt="Late night jam" className="w-full h-[150px] object-cover" />
@@ -433,14 +405,11 @@ const Landing = () => {
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Social</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Top-right card */}
-            <motion.div
+            <div
               className="hidden md:block absolute right-[-100px] lg:right-[-40px] top-[20px] w-[200px] lg:w-[260px]"
-              initial={{ opacity: 0, scale: 0.3, x: 80, y: -60 }}
-              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.25 }}
             >
               <div className="rounded-2xl overflow-hidden shadow-lg rotate-[-6deg]">
                 <img src={eventStartup} alt="Startup weekend" className="w-full h-[150px] object-cover" />
@@ -448,14 +417,11 @@ const Landing = () => {
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Hackathon</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Bottom-right card */}
-            <motion.div
+            <div
               className="hidden md:block absolute right-[-120px] lg:right-[-60px] bottom-[20px] w-[200px] lg:w-[260px]"
-              initial={{ opacity: 0, scale: 0.3, x: 80, y: 60 }}
-              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.4 }}
             >
               <div className="rounded-2xl overflow-hidden shadow-lg rotate-[5deg]">
                 <img src={eventSummit} alt="Vibe coding summit" className="w-full h-[150px] object-cover" />
@@ -463,22 +429,16 @@ const Landing = () => {
                   <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Conference</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Center — headline */}
-            <motion.div
+            <div
               className="text-center max-w-3xl mx-auto relative z-10"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
             >
               <div className="flex items-center justify-center mb-6">
                 <Logo size="lg" />
               </div>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.5 }}
+              <div
                 className="inline-flex items-center gap-2 mb-7 bg-primary/10 text-primary px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-[0.18em] uppercase"
               >
                 <span className="relative flex h-1.5 w-1.5">
@@ -486,7 +446,7 @@ const Landing = () => {
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
                 </span>
                 {hero.badge}
-              </motion.div>
+              </div>
               <h1 className="text-5xl sm:text-6xl lg:text-[68px] 2xl:text-[80px] font-display tracking-[-0.035em] leading-[0.95] text-foreground mb-7" style={{ fontWeight: titleWeight }}>
                 {hero.headline_prefix}{" "}
                 <span className="inline-grid justify-items-center">
@@ -514,7 +474,7 @@ const Landing = () => {
               <Button size="lg" className="text-base font-semibold px-9 h-14 shadow-xl shadow-foreground/10" asChild>
                 <Link to="/auth">{hero.cta} <ArrowRight className="ml-2 w-4 h-4" /></Link>
               </Button>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -547,13 +507,9 @@ const Landing = () => {
               { img: eventStartup, title: "Startup weekend", tag: "$25", date: "Fri, Apr 11", city: "New York" },
               { img: eventSummit, title: "Vibe coding summit", tag: "Free", date: "Sat, Apr 19", city: "Remote" },
             ].map((event, i) => (
-              <motion.div
+              <div
                 key={event.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -6 }}
+                className="transition-transform hover:-translate-y-1.5"
               >
                 <div className="group cursor-pointer">
                   <div className="relative rounded-3xl overflow-hidden mb-4 aspect-[4/5]">
@@ -571,7 +527,7 @@ const Landing = () => {
                   <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors tracking-[-0.01em]">{event.title}</h3>
                   <p className="text-sm text-muted-foreground mt-0.5">{event.city}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -584,12 +540,8 @@ const Landing = () => {
           <div className="absolute top-1/4 right-0 w-[420px] h-[420px] rounded-full bg-primary/5 blur-[120px]" />
         </div>
         <div className="max-w-6xl mx-auto px-6 lg:px-8 relative">
-          <motion.div
+          <div
             className="text-center mb-16 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
           >
             <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-4">{featuresContent.eyebrow}</span>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display mb-5 text-foreground tracking-[-0.035em] leading-[1.02]" style={{ fontWeight: titleWeight }}>
@@ -600,7 +552,7 @@ const Landing = () => {
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               {featuresContent.subhead}
             </p>
-          </motion.div>
+          </div>
 
           {/* Bento grid — asymmetric editorial layout */}
           {(() => {
@@ -631,13 +583,9 @@ const Landing = () => {
                   {features.slice(0, 2).map((feature, i) => {
                     const Illust = ILLUSTRATIONS[i];
                     return (
-                      <motion.div
+                      <div
                         key={feature.title}
-                        initial={{ opacity: 0, y: 24 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.2 }}
-                        transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ y: -6 }}
+                        className="transition-transform hover:-translate-y-1.5"
                       >
                         <div className={`h-full rounded-[2rem] overflow-hidden flex flex-col shadow-sm ${bodyTones[i]}`}>
                           <div className={`${currentPreset.colors[i]} aspect-[5/3] flex items-center justify-center`}>
@@ -649,7 +597,7 @@ const Landing = () => {
                             <p className={`text-sm leading-relaxed ${subTones[i]}`}>{feature.description}</p>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
@@ -660,14 +608,9 @@ const Landing = () => {
                     const Illust = ILLUSTRATIONS[i];
                     const isWide = rawI === 1;
                     return (
-                      <motion.div
+                      <div
                         key={feature.title}
-                        className={isWide ? "md:col-span-3" : "md:col-span-2"}
-                        initial={{ opacity: 0, y: 24 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.2 }}
-                        transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ y: -6 }}
+                        className={`${isWide ? "md:col-span-3" : "md:col-span-2"} transition-transform hover:-translate-y-1.5`}
                       >
                         <div className={`h-full rounded-[2rem] overflow-hidden flex ${isWide ? "flex-col sm:flex-row" : "flex-col"} shadow-sm ${bodyTones[i]}`}>
                           <div className={`${currentPreset.colors[i]} ${isWide ? "sm:w-1/2 aspect-[5/3] sm:aspect-auto" : "aspect-[5/3]"} flex items-center justify-center relative flex-shrink-0`}>
@@ -679,7 +622,7 @@ const Landing = () => {
                             <p className={`text-sm leading-relaxed ${subTones[i]}`}>{feature.description}</p>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
@@ -692,17 +635,13 @@ const Landing = () => {
       {/* Social proof */}
       <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
+          <div
             className="text-center mb-14"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl sm:text-4xl font-display mb-4 text-foreground tracking-[-0.02em]" style={{ fontWeight: titleWeight }}>
               {testimonialsContent.title}
             </h2>
-          </motion.div>
+          </div>
 
           <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
             {(() => {
@@ -710,14 +649,9 @@ const Landing = () => {
               return testimonialsContent.items.map((testimonial, i) => {
                 const avatar = fallbackAvatars[i] ?? fallbackAvatars[fallbackAvatars.length - 1];
                 return (
-                  <motion.div
+                  <div
                     key={`${testimonial.name}-${i}`}
-                    className="basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-1rem)]"
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.15 }}
-                    transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                    whileHover={{ y: -4 }}
+                    className="basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-1rem)] transition-transform hover:-translate-y-1"
                   >
                     <Card className="h-full border-0 shadow-sm overflow-hidden rounded-2xl">
                       <div className="h-[180px] overflow-hidden">
@@ -736,7 +670,7 @@ const Landing = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </div>
                 );
               });
             })()}
@@ -749,13 +683,7 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="relative pt-20 lg:pt-24">
             <div className="absolute inset-x-0 top-0 z-20 flex justify-center pointer-events-none" aria-hidden="true">
-              <motion.div
-                initial={{ opacity: 0, y: 16, scale: 0.85 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, type: "spring", stiffness: 220, damping: 18 }}
-                className="drop-shadow-[0_18px_40px_hsl(240_30%_14%_/_0.18)]"
-              >
+              <div className="drop-shadow-[0_18px_40px_hsl(240_30%_14%_/_0.18)]">
                 <svg width="130" height="158" viewBox="0 0 130 158" fill="none" xmlns="http://www.w3.org/2000/svg">
                   {/* Calendar body */}
                   <rect x="10" y="28" width="110" height="120" rx="16" fill="hsl(var(--card))" />
@@ -782,7 +710,7 @@ const Landing = () => {
                   {/* Checkmark on highlighted day */}
                   <path d="M75 100L78 103L84 96" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </motion.div>
+              </div>
             </div>
 
             <div className="bg-foreground rounded-[2.5rem] relative overflow-hidden px-6 pt-24 pb-20 lg:px-10 lg:pt-32 lg:pb-28 max-w-5xl mx-auto">
@@ -806,14 +734,10 @@ const Landing = () => {
                   { x: 146, y: 24, size: 12, color: "hsl(48 100% 62%)", shape: "circle", rot: 0 },
                   { x: -54, y: 58, size: 6, color: "hsl(122 48% 61%)", shape: "square", rot: -45 },
                 ].map((p, i) => (
-                  <motion.div
+                  <div
                     key={i}
                     className="absolute"
-                    style={{ left: `calc(50% + ${p.x}px)`, top: p.y }}
-                    initial={{ opacity: 0, scale: 0, x: -p.x, y: -p.y }}
-                    whileInView={{ opacity: 1, scale: 1, x: 0, y: 0, rotate: p.rot }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 + i * 0.04, duration: 0.5, type: "spring", stiffness: 250, damping: 15 }}
+                    style={{ left: `calc(50% + ${p.x}px)`, top: p.y, transform: `rotate(${p.rot}deg)` }}
                   >
                     {p.shape === "circle" && (
                       <div style={{ width: p.size, height: p.size, borderRadius: "50%", backgroundColor: p.color }} />
@@ -824,17 +748,12 @@ const Landing = () => {
                     {p.shape === "triangle" && (
                       <div style={{ width: 0, height: 0, borderLeft: `${p.size / 2}px solid transparent`, borderRight: `${p.size / 2}px solid transparent`, borderBottom: `${p.size}px solid ${p.color}` }} />
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
               <div className="text-center relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                >
+                <div>
                   <h2 className="text-4xl sm:text-6xl lg:text-7xl font-display mb-6 text-background tracking-[-0.035em] leading-[0.95]" style={{ fontWeight: titleWeight }}>
                     {ctaContent.title_line_1}
                     <br />
@@ -846,7 +765,7 @@ const Landing = () => {
                   <Button size="lg" className="text-base font-semibold px-8 h-12 bg-primary text-primary-foreground hover:bg-primary/90" asChild>
                     <Link to="/auth">{ctaContent.cta_label} <ArrowRight className="ml-2 w-4 h-4" /></Link>
                   </Button>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>

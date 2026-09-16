@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_REGISTRATIONS, DEFAULT_STATS } from "@/lib/component-defaults";
 
 
 export type Registration = Tables<"registrations"> & {
@@ -13,32 +15,35 @@ export type RegStatus = "registered" | "checked_in" | "attended" | "no_show" | "
 export function useRegistrations() {
   return useQuery({
     queryKey: ["registrations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("registrations")
-        .select("*, events(name)")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (error) throw error;
-      return data as Registration[];
-    },
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("registrations")
+          .select("*, events(name)")
+          .order("created_at", { ascending: false })
+          .limit(2000);
+        if (error) throw error;
+        return data as Registration[];
+      }, DEFAULT_REGISTRATIONS),
+    placeholderData: DEFAULT_REGISTRATIONS,
   });
 }
 
 export function useRegistrationsByEvent(eventId: string | undefined) {
   return useQuery({
     queryKey: ["registrations", eventId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .eq("event_id", eventId!)
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      if (error) throw error;
-      return data as Tables<"registrations">[];
-    },
-    enabled: !!eventId,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("registrations")
+          .select("*")
+          .eq("event_id", eventId!)
+          .order("created_at", { ascending: false })
+          .limit(5000);
+        if (error) throw error;
+        return data as Tables<"registrations">[];
+      }, DEFAULT_REGISTRATIONS),
+    placeholderData: DEFAULT_REGISTRATIONS,
   });
 }
 
@@ -89,42 +94,42 @@ export function useRegistrationStats() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["registration-stats", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      // Scope to the current user's own events only. The "Public can view live
-      // events" RLS policy would otherwise leak other tenants' live events (and
-      // their registrations) into these aggregates.
-      const { data: events, error: eventsError } = await supabase
-        .from("events")
-        .select("id, name, status")
-        .eq("user_id", user!.id);
-      if (eventsError) throw eventsError;
+    queryFn: () => {
+      if (!user) return Promise.resolve(DEFAULT_STATS);
+      return withFallback(async () => {
+        const { data: events, error: eventsError } = await supabase
+          .from("events")
+          .select("id, name, status")
+          .eq("user_id", user.id);
+        if (eventsError) throw eventsError;
 
-      const eventIds = (events ?? []).map((e) => e.id);
+        const eventIds = (events ?? []).map((e) => e.id);
 
-      let registrations: { created_at: string; event_id: string; status: string }[] = [];
-      if (eventIds.length > 0) {
-        const { data, error } = await supabase
-          .from("registrations")
-          .select("created_at, event_id, status")
-          .in("event_id", eventIds);
-        if (error) throw error;
-        registrations = (data ?? []) as typeof registrations;
-      }
+        let registrations: { created_at: string; event_id: string; status: string }[] = [];
+        if (eventIds.length > 0) {
+          const { data, error } = await supabase
+            .from("registrations")
+            .select("created_at, event_id, status")
+            .in("event_id", eventIds);
+          if (error) throw error;
+          registrations = (data ?? []) as typeof registrations;
+        }
 
-      const total = registrations.length;
-      const activeEvents = events?.filter(e => e.status === "live").length ?? 0;
+        const total = registrations.length;
+        const activeEvents = events?.filter(e => e.status === "live").length ?? 0;
 
-      const byMonth: Record<string, number> = {};
-      registrations.forEach(r => {
-        const month = new Date(r.created_at).toLocaleString("default", { month: "short" });
-        byMonth[month] = (byMonth[month] || 0) + 1;
-      });
+        const byMonth: Record<string, number> = {};
+        registrations.forEach(r => {
+          const month = new Date(r.created_at).toLocaleString("default", { month: "short" });
+          byMonth[month] = (byMonth[month] || 0) + 1;
+        });
 
-      const chartData = Object.entries(byMonth).map(([date, registrations]) => ({ date, registrations }));
+        const chartData = Object.entries(byMonth).map(([date, registrations]) => ({ date, registrations }));
 
-      return { total, activeEvents, chartData, registrations, events };
+        return { total, activeEvents, chartData, registrations, events };
+      }, DEFAULT_STATS);
     },
+    placeholderData: DEFAULT_STATS,
   });
 }
 

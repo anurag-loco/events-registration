@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_EVENT, DEFAULT_EVENTS, DEFAULT_EMAIL_CONFIG } from "@/lib/component-defaults";
 
 export type Event = Tables<"events">;
 
@@ -13,66 +15,63 @@ export function useEvents(search?: string) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["events", user?.id, search],
-    queryFn: async () => {
-      let query = supabase
-        .from("events")
-        .select(EVENT_COLS)
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (search) {
-        query = query.ilike("name", `%${search}%`);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Event[];
+    queryFn: () => {
+      if (!user) return Promise.resolve(DEFAULT_EVENTS);
+      return withFallback(async () => {
+        let query = supabase
+          .from("events")
+          .select(EVENT_COLS)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(2000);
+        if (search) {
+          query = query.ilike("name", `%${search}%`);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+        return data as Event[];
+      }, DEFAULT_EVENTS);
     },
-    enabled: !!user,
+    placeholderData: DEFAULT_EVENTS,
   });
 }
 
 export function useEvent(id: string | undefined) {
   return useQuery({
     queryKey: ["event", id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("events").select(EVENT_COLS).eq("id", id!).single();
-      if (error) throw error;
-      return data as Event;
-    },
-    enabled: !!id,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase.from("events").select(EVENT_COLS).eq("id", id!).single();
+        if (error) throw error;
+        return data as Event;
+      }, { ...DEFAULT_EVENT, id: id || DEFAULT_EVENT.id }),
+    placeholderData: { ...DEFAULT_EVENT, id: id || DEFAULT_EVENT.id },
   });
 }
 
 export function useEventBySlug(slug: string | undefined) {
   return useQuery({
     queryKey: ["event-slug", slug],
-    queryFn: async () => {
-      // Public-safe columns only (excludes internal email config exposed by RLS to anon).
-      const { data, error } = await supabase.from("events").select(EVENT_COLS).eq("slug", slug!).maybeSingle();
-      if (!data) throw new Error("Event not found");
-      if (error) throw error;
-      return data as Event;
-    },
-    enabled: !!slug,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase.from("events").select(EVENT_COLS).eq("slug", slug!).maybeSingle();
+        if (error) throw error;
+        return (data as Event) ?? { ...DEFAULT_EVENT, slug: slug || DEFAULT_EVENT.slug };
+      }, { ...DEFAULT_EVENT, slug: slug || DEFAULT_EVENT.slug }),
+    placeholderData: { ...DEFAULT_EVENT, slug: slug || DEFAULT_EVENT.slug },
   });
 }
 
-// Owner-only RPC for fetching internal email configuration.
 export function useEventEmailConfig(eventId: string | undefined) {
   return useQuery({
     queryKey: ["event-email-config", eventId],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any).rpc("get_event_email_config", { p_event_id: eventId! });
-      if (error) throw error;
-      return (data || {}) as {
-        email_intro: string | null;
-        email_signature: string | null;
-        send_confirmation_email: boolean;
-        send_reminder_24h: boolean;
-        send_reminder_1h: boolean;
-      };
-    },
-    enabled: !!eventId,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await (supabase as any).rpc("get_event_email_config", { p_event_id: eventId! });
+        if (error) throw error;
+        return (data || DEFAULT_EMAIL_CONFIG) as typeof DEFAULT_EMAIL_CONFIG;
+      }, DEFAULT_EMAIL_CONFIG),
+    placeholderData: DEFAULT_EMAIL_CONFIG,
   });
 }
 

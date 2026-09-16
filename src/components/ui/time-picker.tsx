@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  value: string; // "HH:MM" 24h, or ""
-  onChange: (v: string) => void;
+  value?: string; // "HH:MM" 24h, or ""
+  onChange?: (v: string) => void;
   placeholder?: string;
   className?: string;
   /** When provided, popover shows duration-based suggestions relative to this start time (HH:MM 24h). */
@@ -72,7 +72,13 @@ function formatDuration(mins: number): string {
   return `${h}h ${m}m`;
 }
 
-export function TimePicker({ value, onChange, placeholder = "Select time", className, startTime }: Props) {
+export function TimePicker({
+  value = "",
+  onChange = () => {},
+  placeholder = "Select time",
+  className = "",
+  startTime = "",
+}: Props) {
   const [open, setOpen] = useState(false);
   const parsed = to12(value);
   const hour = parsed?.h ?? 9;

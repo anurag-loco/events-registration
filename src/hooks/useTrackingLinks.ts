@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, Json } from "@/integrations/supabase/types";
+import { withFallback } from "@/lib/supabase-ready";
 
 export type TrackingLink = Tables<"event_tracking_links">;
 
@@ -15,16 +16,17 @@ export type TrackingLinkUtm = {
 export function useTrackingLinks(eventId: string | undefined) {
   return useQuery({
     queryKey: ["tracking-links", eventId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("event_tracking_links")
-        .select("*")
-        .eq("event_id", eventId!)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as TrackingLink[];
-    },
-    enabled: !!eventId,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("event_tracking_links")
+          .select("*")
+          .eq("event_id", eventId!)
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data as TrackingLink[];
+      }, []),
+    placeholderData: [],
   });
 }
 

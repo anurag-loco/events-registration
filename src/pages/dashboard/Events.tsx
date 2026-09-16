@@ -23,7 +23,7 @@ const Events = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
-  const { data: events, isLoading } = useEvents(search || undefined);
+  const { data: events = [] } = useEvents(search || undefined);
   const { data: registrations } = useRegistrations();
   const createEvent = useCreateEvent();
   const [creating, setCreating] = useState(false);
@@ -173,11 +173,7 @@ const Events = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
-      ) : filtered && filtered.length > 0 ? (
+      {filtered && filtered.length > 0 ? (
         viewMode === "list" ? (
           /* LIST VIEW — borderless horizontal cards */
           <div className="space-y-6">

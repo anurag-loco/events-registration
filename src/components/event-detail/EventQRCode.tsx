@@ -5,11 +5,14 @@ import { Download, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 
 interface Props {
-  registrationUrl: string;
-  eventName: string;
+  registrationUrl?: string;
+  eventName?: string;
 }
 
-export default function EventQRCode({ registrationUrl, eventName }: Props) {
+export default function EventQRCode({
+  registrationUrl = "https://example.com/register/summer-showcase",
+  eventName = "Summer Showcase",
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
 

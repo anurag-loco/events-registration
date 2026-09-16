@@ -7,12 +7,14 @@ import { CalendarDays, MapPin, Type, FileText, Globe, DoorOpen, CalendarX, Users
 import { Switch } from "@/components/ui/switch";
 import SmartImageField from "./SmartImageField";
 
+import { DEFAULT_EVENT, noop } from "@/lib/component-defaults";
+
 interface Props {
-  event: Tables<"events">;
-  onUpdate: (fields: Partial<Tables<"events">>) => void;
+  event?: Tables<"events">;
+  onUpdate?: (fields: Partial<Tables<"events">>) => void;
 }
 
-export default function EventQuickInfo({ event, onUpdate }: Props) {
+export default function EventQuickInfo({ event = DEFAULT_EVENT, onUpdate = noop }: Props) {
   const promptSeed = [
     event.name && `Cover photo for "${event.name}"`,
     event.event_type && `Event type: ${event.event_type}`,

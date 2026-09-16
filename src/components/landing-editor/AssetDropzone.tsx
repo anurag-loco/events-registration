@@ -5,15 +5,15 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface AssetDropzoneProps {
-  value: string[];
-  onChange: (urls: string[]) => void;
+  value?: string[];
+  onChange?: (urls: string[]) => void;
   max?: number;
   className?: string;
 }
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
-export function AssetDropzone({ value, onChange, max = 4, className }: AssetDropzoneProps) {
+export function AssetDropzone({ value = [], onChange = () => {}, max = 4, className = "" }: AssetDropzoneProps) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);

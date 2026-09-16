@@ -10,8 +10,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Logo } from "@/components/Logo";
 import { motion } from "framer-motion";
-import { Magnetic } from "@/components/motion/Magnetic";
-import { staggerContainer, staggerItem } from "@/components/motion/Reveal";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -78,7 +76,6 @@ const Auth = () => {
           <motion.div
             key={i}
             className={`absolute ${s.c}`}
-            initial={{ opacity: 0, scale: 0.6 }}
             animate={{
               opacity: 1,
               scale: 1,
@@ -86,8 +83,6 @@ const Auth = () => {
               x: [0, s.m / 2, 0],
             }}
             transition={{
-              opacity: { duration: 0.8, delay: s.d * 0.4 },
-              scale: { duration: 0.8, delay: s.d * 0.4, ease: [0.22, 1, 0.36, 1] },
               y: { duration: 7 + i, repeat: Infinity, ease: "easeInOut", delay: s.d },
               x: { duration: 9 + i, repeat: Infinity, ease: "easeInOut", delay: s.d },
             }}
@@ -95,24 +90,19 @@ const Auth = () => {
         ))}
       </div>
 
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="show"
-        className="w-full max-w-md relative z-10"
-      >
+      <div className="w-full max-w-md relative z-10">
         {/* Logo */}
-        <motion.div variants={staggerItem} className="text-center mb-8">
+        <div className="text-center mb-8">
           <Link to="/" className="inline-block transition-transform duration-300 hover:scale-[1.03]">
             <Logo size="lg" />
           </Link>
           <p className="text-muted-foreground mt-2 text-sm font-body">
             Create events people actually want to attend
           </p>
-        </motion.div>
+        </div>
 
         {/* Auth card */}
-        <motion.div variants={staggerItem} className="bg-card rounded-2xl border border-border shadow-lg p-6 sm:p-7">
+        <div className="bg-card rounded-2xl border border-border shadow-lg p-6 sm:p-7">
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2 rounded-full bg-muted p-1 mb-6">
               <TabsTrigger value="login" className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm text-sm font-medium">
@@ -261,12 +251,12 @@ const Auth = () => {
               </Button>
             </TabsContent>
           </Tabs>
-        </motion.div>
+        </div>
 
-        <motion.p variants={staggerItem} className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           By continuing, you agree to our Terms of Service and Privacy Policy.
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 };

@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   /** ISO date string YYYY-MM-DD */
-  value: string;
-  onChange: (v: string) => void;
+  value?: string;
+  onChange?: (v: string) => void;
   placeholder?: string;
   className?: string;
   /** ISO date string — disable dates before this one */
@@ -21,7 +21,13 @@ function toDate(v: string): Date | undefined {
   return isValid(d) ? d : undefined;
 }
 
-export function DateField({ value, onChange, placeholder = "Pick a date", className, minDate }: Props) {
+export function DateField({
+  value = "",
+  onChange = () => {},
+  placeholder = "Pick a date",
+  className = "",
+  minDate = "",
+}: Props) {
   const [open, setOpen] = useState(false);
   const date = toDate(value);
   const min = toDate(minDate || "");

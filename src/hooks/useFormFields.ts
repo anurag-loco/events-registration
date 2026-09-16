@@ -1,22 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, TablesInsert } from "@/integrations/supabase/types";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_FORM_FIELDS } from "@/lib/component-defaults";
 
 export type FormField = Tables<"form_fields">;
 
 export function useFormFields(eventId: string | undefined) {
   return useQuery({
     queryKey: ["form_fields", eventId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("form_fields")
-        .select("*")
-        .eq("event_id", eventId!)
-        .order("position");
-      if (error) throw error;
-      return data as FormField[];
-    },
-    enabled: !!eventId,
+    queryFn: () =>
+      withFallback(async () => {
+        const { data, error } = await supabase
+          .from("form_fields")
+          .select("*")
+          .eq("event_id", eventId!)
+          .order("position");
+        if (error) throw error;
+        return data as FormField[];
+      }, DEFAULT_FORM_FIELDS),
+    placeholderData: DEFAULT_FORM_FIELDS,
   });
 }
 

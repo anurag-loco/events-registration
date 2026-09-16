@@ -11,8 +11,8 @@ type Suggestion = {
 };
 
 type Props = {
-  value: string;
-  onChange: (v: string) => void;
+  value?: string;
+  onChange?: (v: string) => void;
   placeholder?: string;
   className?: string;
 };
@@ -22,7 +22,12 @@ type Props = {
  * No API key required — works out-of-the-box for remixes and templates.
  * Respects Nominatim usage policy with debounce + minimum query length.
  */
-export function AddressAutocomplete({ value, onChange, placeholder, className }: Props) {
+export function AddressAutocomplete({
+  value = "",
+  onChange = () => {},
+  placeholder = "Search address",
+  className = "",
+}: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);

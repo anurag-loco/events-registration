@@ -4,10 +4,9 @@ import { usePublicEventsByUser, usePublicRegistrationCounts } from "@/hooks/useP
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, MapPin, Users, Globe, ExternalLink, Mail, ArrowRight, LayoutGrid, List } from "lucide-react";
+import { DEFAULT_EVENTS, DEFAULT_PROFILE } from "@/lib/component-defaults";
 import { format } from "date-fns";
-import { StaggerGroup, StaggerItem } from "@/components/motion/Reveal";
 
 const SOCIAL_ICONS: Record<string, string> = {
   "Twitter / X": "https://cdn.simpleicons.org/x/ffffff",
@@ -22,34 +21,12 @@ const SOCIAL_ICONS: Record<string, string> = {
 type SocialLink = { platform: string; url: string };
 
 const CompanyPage = () => {
-  const { data: company, isLoading } = useProfile();
-  const { data: events } = usePublicEventsByUser(company?.id);
+  const { data: fetchedProfile } = useProfile();
+  const company = fetchedProfile ?? DEFAULT_PROFILE;
+  const { data: events = DEFAULT_EVENTS } = usePublicEventsByUser(company?.id);
   const eventIds = events?.map((e) => e.id) ?? [];
   const { data: regCounts } = usePublicRegistrationCounts(eventIds);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <Skeleton className="h-[300px] w-full rounded-2xl" />
-        <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-52 rounded-xl" />)}
-        </div>
-      </div>
-    );
-  }
-
-  if (!company) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-foreground">No company profile yet</h1>
-          <p className="text-muted-foreground">Add your company details to populate this page.</p>
-          <Link to="/dashboard/settings"><Button variant="outline" className="rounded-full">Go to settings</Button></Link>
-        </div>
-      </div>
-    );
-  }
 
   const socialLinks: SocialLink[] = Array.isArray(company.social_links) ? (company.social_links as any[]) : [];
 
@@ -133,21 +110,21 @@ const CompanyPage = () => {
             </div>
           </div>
           {viewMode === "grid" ? (
-            <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {upcomingEvents.map((event) => (
-                <StaggerItem key={event.id}>
+                <div key={event.id}>
                   <EventCard event={event} regCount={regCounts?.[event.id]} />
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerGroup>
+            </div>
           ) : (
-            <StaggerGroup className="space-y-4">
+            <div className="space-y-4">
               {upcomingEvents.map((event) => (
-                <StaggerItem key={event.id}>
+                <div key={event.id}>
                   <EventListItem event={event} regCount={regCounts?.[event.id]} />
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerGroup>
+            </div>
           )}
         </section>
       )}
@@ -157,21 +134,21 @@ const CompanyPage = () => {
         <section className="mt-12 pb-4">
           <h2 className="text-2xl font-display font-bold text-foreground mb-5">Past Events</h2>
           {viewMode === "grid" ? (
-            <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {pastEvents.map((event) => (
-                <StaggerItem key={event.id}>
+                <div key={event.id}>
                   <EventCard event={event} regCount={regCounts?.[event.id]} />
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerGroup>
+            </div>
           ) : (
-            <StaggerGroup className="space-y-4">
+            <div className="space-y-4">
               {pastEvents.map((event) => (
-                <StaggerItem key={event.id}>
+                <div key={event.id}>
                   <EventListItem event={event} regCount={regCounts?.[event.id]} />
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerGroup>
+            </div>
           )}
         </section>
       )}

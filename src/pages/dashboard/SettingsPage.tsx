@@ -29,7 +29,7 @@ function generateCompanySlug(name: string): string {
 const SettingsPage = () => {
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile } = useProfile();
   const updateProfile = useUpdateProfile();
   const [fullName, setFullName] = useState("");
   const [company, setCompany] = useState("");
@@ -141,10 +141,6 @@ const SettingsPage = () => {
     setSocialLinks(updated);
   };
   const removeSocialLink = (index: number) => setSocialLinks(socialLinks.filter((_, i) => i !== index));
-
-  if (isLoading) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
-  }
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto">

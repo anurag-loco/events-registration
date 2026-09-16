@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, Loader2, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useLandingContent } from "@/hooks/useLandingContent";
+import { isSupabaseConfigured } from "@/lib/supabase-ready";
 import { AssetDropzone } from "@/components/landing-editor/AssetDropzone";
 import {
   LANDING_DEFAULTS,
@@ -95,7 +94,7 @@ const SECTIONS: {
 
 export default function LandingEditor() {
   const isAdmin = useIsAdmin();
-  const { data: landing, isLoading } = useLandingContent();
+  const { data: landing } = useLandingContent();
   const queryClient = useQueryClient();
 
   const [direction, setDirection] = useState<Record<string, string>>({});
@@ -104,7 +103,7 @@ export default function LandingEditor() {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
 
-  if (isAdmin === false) return <Navigate to="/dashboard/events" replace />;
+  if (isSupabaseConfigured() && isAdmin === false) return <Navigate to="/dashboard/events" replace />;
 
   const regenerateAll = async () => {
     if (bulkBusy) return;
@@ -214,26 +213,14 @@ export default function LandingEditor() {
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-48 rounded-2xl" />
-            ))}
-          </div>
-        ) : (
           <div className="space-y-6">
-            {SECTIONS.map(({ key, description, preview }, idx) => {
+            {SECTIONS.map(({ key, description, preview }) => {
               const content = landing?.content[key] ?? (LANDING_DEFAULTS[key] as any);
               const isCustom = !!landing?.assets[key]?.length || !!landing?.content[key];
               const sectionAssets = landing?.assets[key] ?? [];
 
               return (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05, duration: 0.35 }}
-                >
+                <div key={key}>
                   <Card className="border-0 shadow-sm rounded-3xl overflow-hidden">
                     <div className="grid md:grid-cols-2 gap-0">
                       {/* Left — preview */}
@@ -319,11 +306,10 @@ export default function LandingEditor() {
                       </div>
                     </div>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
           </div>
-        )}
       </div>
     </div>
   );

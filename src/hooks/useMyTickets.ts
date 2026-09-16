@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { withFallback } from "@/lib/supabase-ready";
+import { DEFAULT_MY_TICKETS, DEFAULT_BROWSE_EVENTS } from "@/lib/component-defaults";
 
 export type MyTicket = {
   registration_id: string;
@@ -24,12 +26,15 @@ export function useMyTickets() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["my-tickets", user?.id],
-    enabled: !!user,
-    queryFn: async (): Promise<MyTicket[]> => {
-      const { data, error } = await supabase.rpc("get_my_tickets" as any);
-      if (error) throw error;
-      return (data as unknown as MyTicket[]) ?? [];
+    queryFn: () => {
+      if (!user) return Promise.resolve(DEFAULT_MY_TICKETS);
+      return withFallback(async () => {
+        const { data, error } = await supabase.rpc("get_my_tickets" as any);
+        if (error) throw error;
+        return (data as unknown as MyTicket[]) ?? [];
+      }, DEFAULT_MY_TICKETS);
     },
+    placeholderData: DEFAULT_MY_TICKETS,
   });
 }
 
@@ -48,19 +53,21 @@ export type BrowseEvent = {
 export function useBrowseEvents(excludeEventIds: string[] = []) {
   return useQuery({
     queryKey: ["browse-events", excludeEventIds.sort().join(",")],
-    queryFn: async (): Promise<BrowseEvent[]> => {
-      let q = supabase
-        .from("events")
-        .select("id, name, slug, event_date, location_value, location_type, background_image_url, primary_color, description")
-        .eq("status", "live")
-        .order("event_date", { ascending: true, nullsFirst: false })
-        .limit(50);
-      if (excludeEventIds.length > 0) {
-        q = q.not("id", "in", `(${excludeEventIds.join(",")})`);
-      }
-      const { data, error } = await q;
-      if (error) throw error;
-      return (data as BrowseEvent[]) ?? [];
-    },
+    queryFn: () =>
+      withFallback(async () => {
+        let q = supabase
+          .from("events")
+          .select("id, name, slug, event_date, location_value, location_type, background_image_url, primary_color, description")
+          .eq("status", "live")
+          .order("event_date", { ascending: true, nullsFirst: false })
+          .limit(50);
+        if (excludeEventIds.length > 0) {
+          q = q.not("id", "in", `(${excludeEventIds.join(",")})`);
+        }
+        const { data, error } = await q;
+        if (error) throw error;
+        return (data as BrowseEvent[]) ?? [];
+      }, DEFAULT_BROWSE_EVENTS),
+    placeholderData: DEFAULT_BROWSE_EVENTS,
   });
 }

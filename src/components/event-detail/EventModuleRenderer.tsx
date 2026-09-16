@@ -1,8 +1,9 @@
 import type { EventModule } from "@/hooks/useEventModules";
 import { PublicModule } from "@/components/event-public/PublicModule";
+import { DEFAULT_BRAND_COLOR, DEFAULT_MODULES } from "@/lib/component-defaults";
 
 interface Props {
-  modules: EventModule[];
+  modules?: EventModule[];
   brandColor?: string;
   compact?: boolean;
   editable?: boolean;
@@ -15,8 +16,8 @@ interface Props {
  * the public event page so previews always match the live page.
  */
 export default function EventModuleRenderer({
-  modules,
-  brandColor = "#7C3AED",
+  modules = DEFAULT_MODULES,
+  brandColor = DEFAULT_BRAND_COLOR,
 }: Props) {
   const visible = modules.filter((m) => m.enabled).sort((a, b) => a.position - b.position);
   if (visible.length === 0) return null;

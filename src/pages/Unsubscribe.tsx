@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loader2, MailCheck, MailX, MailMinus } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { isSupabaseConfigured } from "@/lib/supabase-ready";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
@@ -16,6 +17,10 @@ export default function Unsubscribe() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setState("valid");
+      return;
+    }
     if (!token) { setState("invalid"); return; }
     (async () => {
       try {
