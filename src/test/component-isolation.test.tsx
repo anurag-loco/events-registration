@@ -12,6 +12,8 @@ import { NavLink } from "@/components/NavLink";
 import { OrganizerOnly } from "@/components/OrganizerOnly";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { RoleHomeRedirect } from "@/components/RoleHomeRedirect";
+import Unsubscribe from "@/pages/Unsubscribe";
+import EventDetailEditRedirect from "@/pages/dashboard/EventDetailEditRedirect";
 import { MagicWandIcon } from "@/components/icons/MagicWandIcon";
 import PolaroidIcon from "@/components/icons/PolaroidIcon";
 import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/Reveal";
@@ -52,6 +54,8 @@ const components: { name: string; Component: ComponentType; wrapSidebar?: boolea
   { name: "OrganizerOnly", Component: OrganizerOnly },
   { name: "ProtectedRoute", Component: ProtectedRoute },
   { name: "RoleHomeRedirect", Component: RoleHomeRedirect },
+  { name: "Unsubscribe", Component: Unsubscribe },
+  { name: "EventDetailEditRedirect", Component: EventDetailEditRedirect },
   { name: "MagicWandIcon", Component: MagicWandIcon },
   { name: "PolaroidIcon", Component: PolaroidIcon },
   { name: "Reveal", Component: Reveal },

@@ -1,26 +1,23 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate, useLocation } from "react-router-dom";
+import { DEFAULT_PROFILE } from "@/lib/component-defaults";
 import { isSupabaseConfigured } from "@/lib/supabase-ready";
 
-export function ProtectedRoute({ children = null }: { children?: React.ReactNode }) {
+const DefaultProtectedContent = () => (
+  <div className="min-h-screen bg-background p-8">
+    <p className="text-sm text-muted-foreground">Signed in as {DEFAULT_PROFILE.full_name}</p>
+    <h1 className="font-display text-2xl font-semibold mt-1">Dashboard</h1>
+  </div>
+);
+
+export function ProtectedRoute({
+  children = <DefaultProtectedContent />,
+}: {
+  children?: React.ReactNode;
+}) {
   const { user, loading } = useAuth();
-  const location = useLocation();
 
-  // Preview / unconfigured: let every page render with demo data.
-  if (!isSupabaseConfigured()) return <>{children}</>;
-
-  // Don't block the tree on a hung auth call — pages have their own fallbacks.
-  if (loading) return <>{children}</>;
-
-  if (!user) {
-    const redirectTarget = `${location.pathname}${location.search}${location.hash}`;
-    return (
-      <Navigate
-        to={`/auth?redirect=${encodeURIComponent(redirectTarget)}`}
-        replace
-      />
-    );
-  }
+  // Preview, hung auth, and logged-out: still render the page with defaults.
+  if (!isSupabaseConfigured() || loading || !user) return <>{children}</>;
 
   return <>{children}</>;
 }

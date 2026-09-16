@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -20,12 +20,8 @@ import Ticket from "./pages/Ticket";
 import Unsubscribe from "./pages/Unsubscribe";
 import CompanyPage from "./pages/dashboard/CompanyPage";
 import Events from "./pages/dashboard/Events";
-// Legacy wizard removed — events are now created/edited inline on EventDetail.
-const EventDetailEditRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/dashboard/events/${id}`} replace />;
-};
 import EventDetail from "./pages/dashboard/EventDetail";
+import EventDetailEditRedirect from "./pages/dashboard/EventDetailEditRedirect";
 import AttendeeHome from "./pages/dashboard/AttendeeHome";
 import Attendees from "./pages/dashboard/Attendees";
 import Analytics from "./pages/dashboard/Analytics";

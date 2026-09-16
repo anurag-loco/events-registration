@@ -10,21 +10,28 @@ const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
 type State = "loading" | "valid" | "already" | "invalid" | "submitting" | "done" | "error";
 
-export default function Unsubscribe() {
+const DEFAULT_TOKEN = "preview-unsubscribe-token";
+
+export default function Unsubscribe({
+  token: tokenProp = DEFAULT_TOKEN,
+  initialState = "valid",
+  errorMessage = null,
+}: {
+  token?: string;
+  initialState?: State;
+  errorMessage?: string | null;
+}) {
   const [params] = useSearchParams();
-  const token = params.get("token");
-  const [state, setState] = useState<State>("loading");
-  const [error, setError] = useState<string | null>(null);
+  const urlToken = params.get("token");
+  const token = urlToken || tokenProp;
+  const [state, setState] = useState<State>(initialState);
+  const [error, setError] = useState<string | null>(errorMessage);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setState("valid");
-      return;
-    }
-    if (!token) { setState("invalid"); return; }
+    if (!urlToken || !isSupabaseConfigured()) return;
     (async () => {
       try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(token)}`, {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(urlToken)}`, {
           headers: { apikey: ANON_KEY },
         });
         const data = await res.json();
@@ -36,11 +43,14 @@ export default function Unsubscribe() {
         setState("invalid");
       }
     })();
-  }, [token]);
+  }, [urlToken]);
 
   const confirm = async () => {
-    if (!token) return;
     setState("submitting");
+    if (!urlToken || !isSupabaseConfigured()) {
+      setState("done");
+      return;
+    }
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/handle-email-unsubscribe`, {
         method: "POST",

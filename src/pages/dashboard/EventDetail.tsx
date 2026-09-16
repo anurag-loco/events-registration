@@ -37,11 +37,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const EventDetail = () => {
-  const { id } = useParams();
+const EventDetail = ({ eventId: eventIdProp }: { eventId?: string } = {}) => {
+  const { id: paramId } = useParams();
+  const id = eventIdProp || paramId || DEFAULT_EVENT.id;
   const navigate = useNavigate();
   const { data: fetched } = useEvent(id);
-  const event = fetched ?? { ...DEFAULT_EVENT, id: id || DEFAULT_EVENT.id };
+  const event = fetched ?? { ...DEFAULT_EVENT, id };
   const { data: formFields } = useFormFields(id);
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
