@@ -214,28 +214,85 @@ function formatEventDateTime(event: Event) {
 
 // ─── Extracted stable components ───
 
-const SuccessCard = ({ brandColor, eventName, waitlisted, isDark }: { brandColor: string; eventName: string; waitlisted: boolean; isDark?: boolean }) => (
-  <div className="w-full max-w-lg mx-auto relative z-10">
-    <GlassCard isDark={isDark} brandColor={brandColor}>
-      <div className="p-10 text-center">
-        <div className="relative inline-block mb-5">
-          <div className="absolute inset-0 blur-2xl rounded-full" style={{ background: brandColor, opacity: 0.5 }} />
-          <div className="relative w-20 h-20 rounded-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${brandColor}, hsl(265 90% 65%))`, boxShadow: `0 12px 40px -8px ${brandColor}88` }}>
-            {waitlisted ? <Clock className="w-9 h-9 text-white" /> : <CheckCircle2 className="w-9 h-9 text-white" />}
+export const SuccessCard = ({
+  brandColor,
+  eventName,
+  waitlisted,
+  isDark = false,
+}: {
+  brandColor: string;
+  eventName: string;
+  waitlisted: boolean;
+  isDark?: boolean;
+}) => {
+  const nextStep = waitlisted
+    ? "We’ll email you if a spot opens up."
+    : "Confirmation email shortly.";
+
+  return (
+    <div className="relative z-10 mx-auto flex min-h-full w-full max-w-lg items-center justify-center bg-transparent px-3 sm:px-4">
+      <GlassCard isDark={isDark} brandColor={brandColor} className="w-full overflow-hidden">
+        <div className="p-5 text-center sm:p-6">
+          <div className="relative mb-3.5 inline-flex">
+            <div
+              aria-hidden="true"
+              className="absolute -inset-2 rounded-full blur-xl"
+              style={{ background: brandColor, opacity: 0.22 }}
+            />
+            <div
+              role="img"
+              aria-label={waitlisted ? "Waitlist status" : "Registration successful"}
+              className="relative flex h-14 w-14 items-center justify-center rounded-full"
+              style={{
+                background: `linear-gradient(135deg, ${brandColor}, hsl(265 90% 65%))`,
+                boxShadow: `0 12px 32px -10px ${brandColor}88`,
+              }}
+            >
+              {waitlisted ? (
+                <Clock aria-hidden="true" className="h-7 w-7 text-white" strokeWidth={2.25} />
+              ) : (
+                <CheckCircle2 aria-hidden="true" className="h-7 w-7 text-white" strokeWidth={2.25} />
+              )}
+            </div>
+          </div>
+
+          <h2 className="mb-2 text-2xl font-display font-bold leading-tight tracking-[-0.02em] text-foreground sm:text-[26px]">
+            {waitlisted ? "You're on the waitlist" : "You're registered"}
+          </h2>
+
+          <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
+            {waitlisted
+              ? "This event is at capacity. We've added you to the waitlist."
+              : "Thank you for registering."}
+          </p>
+
+          <div
+            aria-label="Registration details"
+            className="mt-3.5 grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card/70 p-3 text-left shadow-sm max-[430px]:grid-cols-1"
+          >
+            <div className="min-w-0">
+              <div className="mb-1 text-[11px] font-bold uppercase leading-tight tracking-[0.08em] text-muted-foreground">
+                Event
+              </div>
+              <div className="break-words text-sm font-semibold leading-snug text-card-foreground">
+                {eventName}
+              </div>
+            </div>
+
+            <div className="min-w-0">
+              <div className="mb-1 text-[11px] font-bold uppercase leading-tight tracking-[0.08em] text-muted-foreground">
+                Next
+              </div>
+              <div className="break-words text-sm font-semibold leading-snug text-card-foreground">
+                {nextStep}
+              </div>
+            </div>
           </div>
         </div>
-        <h2 className="text-3xl font-display font-bold mb-3 tracking-[-0.02em]">
-          {waitlisted ? "You're on the waitlist" : "You're registered"}
-        </h2>
-        <p className="text-muted-foreground leading-relaxed">
-          {waitlisted
-            ? <>This event is at capacity. We've added you to the waitlist for <strong>{eventName}</strong> and will email you if a spot opens up.</>
-            : <>Thank you for registering for <strong>{eventName}</strong>. You'll receive a confirmation email shortly.</>}
-        </p>
-      </div>
-    </GlassCard>
-  </div>
-);
+      </GlassCard>
+    </div>
+  );
+};
 
 const EventInfo = ({ event, className = "" }: { event: Event; className?: string }) => {
   const [expanded, setExpanded] = useState(false);
@@ -587,4 +644,3 @@ const Register = () => {
 };
 
 export default Register;
-

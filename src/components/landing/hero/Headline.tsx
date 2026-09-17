@@ -41,9 +41,14 @@ export function Headline({
       <p className="text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
         {hero.subhead}
       </p>
-      <Button size="lg" className="text-base font-semibold px-9 h-14 shadow-xl shadow-foreground/10" asChild>
-        <Link to="/auth">{hero.cta} <ArrowRight className="ml-2 w-4 h-4" /></Link>
-      </Button>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Button size="lg" className="text-base font-semibold px-9 h-14 shadow-xl shadow-foreground/10" asChild>
+          <Link to="/auth">{hero.cta} <ArrowRight className="ml-2 w-4 h-4" /></Link>
+        </Button>
+        <Button size="lg" variant="outline" className="text-base font-semibold px-9 h-14" asChild>
+          <Link to="/auth">Sign in</Link>
+        </Button>
+      </div>
     </div>
   );
 }

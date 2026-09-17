@@ -19,12 +19,13 @@ export function QuoteCard({
           <img src={avatar} alt={name} className="w-full h-full object-cover object-center" />
         </div>
         <CardContent className="p-6">
-          <div className="flex gap-0.5 mb-4">
-            {[...Array(5)].map((_, j) => (
-              <Star key={j} className="w-4 h-4 fill-primary text-primary" />
-            ))}
+          <div className="flex items-start justify-between gap-4 mb-5">
+            <p className="text-foreground text-sm leading-relaxed flex-1">"{quote}"</p>
+            <div className="flex items-center gap-1 shrink-0 text-sm font-medium text-foreground" aria-label="Rating: 5 out of 5">
+              <span>5.0</span>
+              <Star className="w-4 h-4 fill-primary text-primary" aria-hidden="true" />
+            </div>
           </div>
-          <p className="text-foreground text-sm leading-relaxed mb-5">"{quote}"</p>
           <div>
             <p className="font-display font-semibold text-sm text-foreground">{name}</p>
             <p className="text-xs text-muted-foreground">{role}</p>
