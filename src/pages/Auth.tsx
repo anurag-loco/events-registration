@@ -13,8 +13,13 @@ import { motion } from "framer-motion";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
+  const redirectTo = redirectParam || "/dashboard";
+  const mode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const authReturnUrl = new URL("/auth", window.location.origin);
+  authReturnUrl.searchParams.set("mode", mode);
+  if (redirectParam) authReturnUrl.searchParams.set("redirect", redirectParam);
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
@@ -22,6 +27,20 @@ const Auth = () => {
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+
+  const handleModeChange = (value: string) => {
+    if (value !== "login" && value !== "signup") return;
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set("mode", value);
+    setSearchParams(nextSearchParams, { replace: true });
+  };
+
+  const handleGoogleSignIn = async () => {
+    const { error } = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: authReturnUrl.toString(),
+    });
+    if (error) toast.error(error.message || "Google sign-in failed");
+  };
 
   useEffect(() => {
     if (user) navigate(redirectTo, { replace: true });
@@ -50,7 +69,7 @@ const Auth = () => {
       password: signupPassword,
       options: {
         data: { full_name: signupName },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: authReturnUrl.toString(),
       },
     });
     setLoading(false);
@@ -103,7 +122,18 @@ const Auth = () => {
 
         {/* Auth card */}
         <div className="bg-card rounded-2xl border border-border shadow-lg p-6 sm:p-7">
-          <Tabs defaultValue="login">
+          <div className="mb-6 text-center">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+              {mode === "signup" ? "Create your account" : "Welcome back"}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {mode === "signup"
+                ? "Get started building events and bringing your community together."
+                : "Sign in to manage your events and continue where you left off."}
+            </p>
+          </div>
+
+          <Tabs value={mode} onValueChange={handleModeChange}>
             <TabsList className="grid w-full grid-cols-2 rounded-full bg-muted p-1 mb-6">
               <TabsTrigger value="login" className="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-sm text-sm font-medium">
                 Log in
@@ -141,7 +171,7 @@ const Auth = () => {
                     data-testid="login-password"
                   />
                 </div>
-                <Button type="submit" className="w-full rounded-full h-11 bg-foreground text-background hover:bg-foreground/90 hover:scale-[1.02] transition-transform font-medium" disabled={loading} data-testid="login-submit">
+                <Button type="submit" className="w-full rounded-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] transition-transform font-semibold" disabled={loading} data-testid="login-submit">
                   {loading ? "Signing in…" : "Sign in"}
                 </Button>
                 <button
@@ -168,10 +198,7 @@ const Auth = () => {
               <Button
                 variant="outline"
                 className="w-full mt-5 rounded-full h-11 border-input hover:bg-muted font-medium"
-                onClick={async () => {
-                  const { error } = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-                  if (error) toast.error(error.message || "Google sign-in failed");
-                }}
+                onClick={handleGoogleSignIn}
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -223,7 +250,7 @@ const Auth = () => {
                     data-testid="signup-password"
                   />
                 </div>
-                <Button type="submit" className="w-full rounded-full h-11 bg-foreground text-background hover:bg-foreground/90 hover:scale-[1.02] transition-transform font-medium" disabled={loading} data-testid="signup-submit">
+                <Button type="submit" className="w-full rounded-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] transition-transform font-semibold" disabled={loading} data-testid="signup-submit">
                   {loading ? "Creating account…" : "Create account"}
                 </Button>
               </form>
@@ -236,10 +263,7 @@ const Auth = () => {
               <Button
                 variant="outline"
                 className="w-full mt-5 rounded-full h-11 border-input hover:bg-muted font-medium"
-                onClick={async () => {
-                  const { error } = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-                  if (error) toast.error(error.message || "Google sign-in failed");
-                }}
+                onClick={handleGoogleSignIn}
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>

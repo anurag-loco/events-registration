@@ -26,10 +26,10 @@ export function Nav() {
         </Link>
         <div className="flex items-center gap-3">
           <Button variant="ghost" className="text-sm font-medium" asChild>
-            <Link to="/auth">Log in</Link>
+            <Link to="/auth?mode=login">Log in</Link>
           </Button>
           <Button className="hidden sm:inline-flex text-sm font-semibold" asChild>
-            <Link to="/auth">Sign up</Link>
+            <Link to="/auth?mode=signup">Sign up</Link>
           </Button>
         </div>
       </div>
