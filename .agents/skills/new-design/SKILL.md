@@ -19,6 +19,6 @@ guideline settings](#hexby-guidelines) so they can review it.
 
 ## Project-specific guidelines
 
-- Use existing tokens.
+- Reuse tokens.
 
 <!-- hexby-project-guidelines:end -->
