@@ -182,7 +182,7 @@ function EventCard({ event, regCount }: { event: any; regCount?: number }) {
         <CardContent className="p-5 space-y-3">
           {event.event_date && (
             <p className="text-xs font-semibold text-primary uppercase tracking-wide">
-              {format(new Date(event.event_date), "EEE, MMM d · h:mm a")}
+             On {format(new Date(event.event_date), "EEE, MMM d · h:mm a")}
             </p>
           )}
           <h3 className="font-display font-bold text-lg text-foreground leading-tight line-clamp-2">{event.name}</h3>
