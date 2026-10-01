@@ -35,7 +35,7 @@ export function CallToAction({
                 {content.subhead}
               </p>
               <Button size="lg" className="text-base font-semibold px-8 h-12 bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-                <Link to="/auth">{content.cta_label} <ArrowRight className="ml-2 w-4 h-4" /></Link>
+                <Link to="/auth?mode=signup">{content.cta_label} <ArrowRight className="ml-2 w-4 h-4" /></Link>
               </Button>
             </div>
           </div>

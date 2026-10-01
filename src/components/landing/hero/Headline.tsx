@@ -43,10 +43,10 @@ export function Headline({
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Button size="lg" className="text-base font-semibold px-9 h-14 shadow-xl shadow-foreground/10" asChild>
-          <Link to="/auth">{hero.cta} <ArrowRight className="ml-2 w-4 h-4" /></Link>
+          <Link to="/auth?mode=signup">{hero.cta} <ArrowRight className="ml-2 w-4 h-4" /></Link>
         </Button>
         <Button size="lg" variant="outline" className="text-base font-semibold px-9 h-14" asChild>
-          <Link to="/auth">Sign in</Link>
+          <Link to="/auth?mode=login">Sign in</Link>
         </Button>
       </div>
     </div>
